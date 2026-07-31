@@ -8,13 +8,8 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>FinPro - Sistem Keuangan Profesional</title>
   
-  <!-- Tailwind CSS untuk Styling Modern -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Chart.js untuk Grafik Interaktif -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <!-- Phosphor Icons untuk Ikon yang Elegan -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
 
   <script>
@@ -40,8 +35,8 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
     body {
-      background-color: #F3F4F6; /* Gray 100 */
-      color: #1F2937; /* Gray 800 */
+      background-color: #F3F4F6;
+      color: #1F2937;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -52,21 +47,16 @@
     ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
     /* Modal Animation */
-    .modal-enter { opacity: 0; transform: scale(0.95); }
-    .modal-enter-active {
-      opacity: 1;
-      transform: scale(1);
-      transition: opacity 200ms ease-out, transform 200ms ease-out;
-    }
+    .modal-enter { opacity: 0; transform: scale(0.95); transition: all 0.3s ease-out; pointer-events: none;}
+    .modal-enter-active { opacity: 1; transform: scale(1); pointer-events: auto; }
     
     /* Install Popup Animation */
-    @keyframes slideUpFade {
-      from { transform: translateY(100px) scale(0.9); opacity: 0; }
-      to { transform: translateY(0) scale(1); opacity: 1; }
+    @keyframes bounceIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      60% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
     }
-    .install-popup-anim {
-      animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-    }
+    .popup-bounce { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
 
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -75,14 +65,8 @@
     .nav-item.active i { color: var(--theme-color, #4F46E5); }
     
     /* Toast Animations */
-    @keyframes slideInUp {
-      from { transform: translateY(100%); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-      from { opacity: 1; }
-      to { opacity: 0; }
-    }
+    @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
     .toast-exit { animation: fadeOut 0.3s ease-out forwards; }
   </style>
@@ -90,9 +74,9 @@
 <body class="flex h-screen overflow-hidden text-sm md:text-base">
 
   <!-- Sidebar (Desktop) -->
-  <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10">
+  <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10 relative">
     <div class="p-6 flex items-center gap-3 border-b border-gray-100">
-      <img src="https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm">
+      <img src="https://placehold.co/100x100/4F46E5/ffffff?text=FP" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
       <h1 class="text-xl font-bold text-gray-800 tracking-tight" id="sidebar-app-name">FinPro</h1>
     </div>
     
@@ -110,7 +94,7 @@
         <i class="ph ph-target text-xl"></i><span>Target</span>
       </button>
       <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
-        <i class="ph ph-gear text-xl"></i><span>Pengaturan</span>
+        <i class="ph ph-gear text-xl"></i><span>Pengaturan App</span>
       </button>
     </nav>
     
@@ -127,7 +111,7 @@
     <!-- Topbar (Mobile only) -->
     <header class="md:hidden bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10">
       <div class="flex items-center gap-2">
-        <img src="https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm">
+        <img src="https://placehold.co/100x100/4F46E5/ffffff?text=FP" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
         <h1 class="text-lg font-bold text-gray-800" id="mobile-app-name">FinPro</h1>
       </div>
       <button onclick="openModal('add-transaction')" class="dynamic-bg bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
@@ -138,6 +122,7 @@
     <!-- Scrollable Content Area -->
     <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8" id="main-scroll">
       
+      <!-- DASHBOARD VIEW -->
       <section id="view-dashboard" class="space-y-6 block">
         <div class="flex justify-between items-end">
           <div>
@@ -233,82 +218,83 @@
         <h2 class="text-2xl font-bold text-gray-800">Pengaturan & Web App Builder</h2>
 
         <!-- MODUL WEB APP BUILDER -->
-        <div class="dynamic-gradient-bg bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl shadow-lg overflow-hidden mb-6 text-white relative">
+        <div class="dynamic-gradient-bg bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl shadow-lg overflow-hidden mb-6 text-white relative">
           <!-- Dekorasi Latar -->
-          <div class="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
-            <i class="ph ph-rocket-launch text-9xl"></i>
+          <div class="absolute -top-10 -right-10 p-8 opacity-20 pointer-events-none transform rotate-12">
+            <i class="ph ph-android-logo text-[180px]"></i>
           </div>
           
-          <div class="p-6 relative z-10">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="bg-white/20 p-2 rounded-xl backdrop-blur-sm">
+          <div class="p-8 relative z-10">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm border border-white/20">
                 <i class="ph ph-wrench text-2xl"></i>
               </div>
-              <h3 class="text-xl font-bold">Web App Builder (PWA)</h3>
+              <h3 class="text-2xl font-bold">App Builder</h3>
             </div>
-            <p class="text-sm text-white/90 mb-6 leading-relaxed">
-              Sesuaikan identitas aplikasi sebelum Anda menginstalnya ke perangkat Android / Desktop. Perubahan akan diterapkan pada konfigurasi aplikasi.
+            <p class="text-sm text-white/90 mb-8 max-w-md leading-relaxed">
+              Ubah identitas aplikasi sesuka Anda. Setelah diterapkan, klik <b>Instal</b> untuk menjadikan ini Aplikasi Android penuh (WebAPK) di perangkat Anda.
             </p>
             
-            <div class="space-y-4 max-w-md">
+            <div class="space-y-5 max-w-md bg-black/10 p-6 rounded-2xl border border-white/10 backdrop-blur-md">
               <div>
-                <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-1">Nama Aplikasi Anda</label>
-                <input type="text" id="builder-name" value="FinPro" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-white outline-none backdrop-blur-sm transition-all">
+                <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-2">Nama Aplikasi</label>
+                <input type="text" id="builder-name" value="FinPro" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-white outline-none transition-all font-medium text-lg">
               </div>
               <div>
-                <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-1">Warna Tema Aplikasi</label>
-                <div class="flex items-center gap-3">
-                  <input type="color" id="builder-color" value="#4F46E5" class="w-14 h-14 border-2 border-white/30 rounded-xl p-1 cursor-pointer bg-white/10">
-                  <span class="text-sm font-medium text-white/80">Pilih warna dominan (Navbar, Tombol)</span>
+                <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-2">Warna Tema (Branding)</label>
+                <div class="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/10">
+                  <input type="color" id="builder-color" value="#4F46E5" class="w-12 h-12 border-2 border-white/30 rounded-lg cursor-pointer bg-transparent">
+                  <span class="text-sm font-medium text-white/90 flex-1">Menentukan warna dominan navbar & ikon.</span>
                 </div>
               </div>
               
-              <div class="pt-4 border-t border-white/20 flex flex-col sm:flex-row gap-3">
-                <button id="btn-apply-builder" class="flex-1 bg-white text-gray-800 py-3 rounded-xl font-bold shadow-md hover:bg-gray-50 transition-colors flex justify-center items-center gap-2">
-                  <i class="ph ph-magic-wand"></i> Terapkan & Siapkan
+              <div class="pt-4 flex flex-col gap-3">
+                <button id="btn-apply-builder" class="w-full bg-white text-gray-900 py-3.5 rounded-xl font-bold shadow-lg shadow-black/10 hover:bg-gray-100 transition-all flex justify-center items-center gap-2 transform active:scale-95">
+                  <i class="ph ph-magic-wand text-xl"></i> Terapkan Perubahan
                 </button>
-                <button id="btn-install-settings" class="flex-1 bg-black/30 hover:bg-black/40 text-white border border-white/20 py-3 rounded-xl font-bold transition-colors flex justify-center items-center gap-2 backdrop-blur-sm">
-                  <i class="ph ph-download-simple"></i> Instal App Android
+                <button id="btn-trigger-install-modal" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white border border-emerald-400/50 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-emerald-900/20 transform active:scale-95">
+                  <i class="ph ph-download-simple text-xl"></i> Instal sebagai Aplikasi Android
                 </button>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Preferensi Biasa -->
         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
           <div class="p-6 border-b border-gray-100">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Preferensi Umum</h3>
             <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Mata Uang</label>
-                <select id="setting-currency" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-200 outline-none">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mata Uang Default</label>
+                <select id="setting-currency" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none bg-gray-50">
                   <option value="IDR">Rupiah (Rp)</option>
                   <option value="USD">US Dollar ($)</option>
                   <option value="EUR">Euro (€)</option>
                 </select>
               </div>
-              <button onclick="saveSettings()" class="bg-gray-800 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-900 transition-colors">
+              <button onclick="saveSettings()" class="dynamic-bg bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-colors">
                 Simpan Preferensi
               </button>
             </div>
           </div>
 
-          <div class="p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Manajemen Data</h3>
-            <p class="text-sm text-gray-500 mb-4">Data disimpan secara lokal di perangkat Anda. Lakukan backup secara berkala.</p>
+          <div class="p-6 bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">Manajemen Data</h3>
+            <p class="text-sm text-gray-500 mb-5">Data disimpan secara lokal di memori perangkat Anda. Lakukan backup berkala.</p>
             
             <div class="flex flex-wrap gap-3">
-              <button onclick="exportData()" class="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                <i class="ph ph-download-simple"></i> Backup Data (JSON)
+              <button onclick="exportData()" class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                <i class="ph ph-export text-lg"></i> Backup Data (JSON)
               </button>
               
-              <label class="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors">
-                <i class="ph ph-upload-simple"></i> Restore Data
+              <label class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors shadow-sm">
+                <i class="ph ph-download-simple text-lg"></i> Restore Data
                 <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
               </label>
 
-              <button onclick="factoryReset()" class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors md:ml-auto mt-4 md:mt-0 w-full md:w-auto justify-center">
-                <i class="ph ph-trash"></i> Hapus Semua Data
+              <button onclick="factoryReset()" class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors md:ml-auto w-full md:w-auto justify-center">
+                <i class="ph ph-trash text-lg"></i> Hapus Semua Data
               </button>
             </div>
           </div>
@@ -341,174 +327,221 @@
   </main>
 
   <!-- MODALS OVERLAY -->
-  <div id="modal-overlay" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 modal-enter flex items-center justify-center p-4">
     
     <!-- MODAL: ADD TRANSACTION -->
-    <div id="modal-add-transaction" class="bg-white rounded-2xl w-full max-w-md shadow-2xl hidden flex-col overflow-hidden max-h-[90vh]">
-      <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
+    <div id="modal-add-transaction" class="bg-white rounded-3xl w-full max-w-md shadow-2xl hidden flex-col overflow-hidden max-h-[90vh]">
+      <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/50">
         <h3 class="text-lg font-bold text-gray-800">Catat Transaksi</h3>
-        <button onclick="closeModals()" class="text-gray-400 hover:text-gray-600 bg-gray-200/50 hover:bg-gray-200 transition-colors rounded-full p-1"><i class="ph ph-x text-lg"></i></button>
+        <button onclick="closeModals()" class="text-gray-400 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 transition-colors rounded-full p-1.5"><i class="ph ph-x text-lg"></i></button>
       </div>
       <div class="p-5 overflow-y-auto">
-        <div class="flex bg-gray-100 p-1 rounded-xl mb-5">
-          <button type="button" onclick="setTxType('expense')" id="btn-type-expense" class="flex-1 py-2 text-sm font-medium rounded-lg bg-white shadow text-danger transition-all">Pengeluaran</button>
+        <div class="flex bg-gray-100/80 p-1.5 rounded-xl mb-6">
+          <button type="button" onclick="setTxType('expense')" id="btn-type-expense" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-white shadow text-danger transition-all">Pengeluaran</button>
           <button type="button" onclick="setTxType('income')" id="btn-type-income" class="flex-1 py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all">Pemasukan</button>
           <button type="button" onclick="setTxType('transfer')" id="btn-type-transfer" class="flex-1 py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all">Transfer</button>
         </div>
-        <form id="form-transaction" class="space-y-4">
+        <form id="form-transaction" class="space-y-5">
           <input type="hidden" id="tx-type" value="expense">
           <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Jumlah</label>
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Uang</label>
             <div class="relative">
-              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium" id="tx-currency-symbol">Rp</span>
-              <input type="number" id="tx-amount" required min="1" step="any" class="w-full pl-10 pr-4 py-3 text-xl font-bold border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-200 outline-none" placeholder="0">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg" id="tx-currency-symbol">Rp</span>
+              <input type="number" id="tx-amount" required min="1" step="any" class="w-full pl-12 pr-4 py-3.5 text-2xl font-black border border-gray-200 rounded-2xl focus:ring-4 focus:ring-primary/10 outline-none text-gray-800 transition-shadow" placeholder="0">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tanggal</label>
-              <input type="date" id="tx-date" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-200 outline-none text-gray-700">
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tanggal</label>
+              <input type="date" id="tx-date" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium">
             </div>
             <div id="wrap-category">
-              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Kategori</label>
-              <select id="tx-category" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-200 outline-none text-gray-700"></select>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
+              <select id="tx-category" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium bg-white"></select>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4" id="wrap-wallets">
             <div id="wrap-wallet-from" class="col-span-2">
-              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1" id="lbl-wallet-from">Dompet</label>
-              <select id="tx-wallet" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-200 outline-none text-gray-700"></select>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2" id="lbl-wallet-from">Gunakan Dompet</label>
+              <select id="tx-wallet" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium bg-white"></select>
             </div>
             <div id="wrap-wallet-to" class="hidden">
-              <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Tujuan Dompet</label>
-              <select id="tx-wallet-to" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-200 outline-none text-gray-700"></select>
+              <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tujuan Dompet</label>
+              <select id="tx-wallet-to" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium bg-white"></select>
             </div>
           </div>
           <div>
-            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Catatan</label>
-            <input type="text" id="tx-note" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-gray-200 outline-none" placeholder="Opsional (Misal: Makan siang / Gaji)">
+            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Catatan Singkat</label>
+            <input type="text" id="tx-note" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium text-gray-700" placeholder="Opsional...">
           </div>
-          <div class="pt-4 border-t border-gray-100">
-            <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 text-white py-3 rounded-xl font-bold shadow-md transition-all">Simpan Transaksi</button>
+          <div class="pt-2">
+            <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/30 transition-all active:scale-[0.98]">Simpan Transaksi</button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- MODAL: ADD WALLET -->
-    <div id="modal-add-wallet" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
+    <div id="modal-add-wallet" class="bg-white rounded-3xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-        <h3 class="text-lg font-bold text-gray-800">Tambah Dompet</h3>
+        <h3 class="text-lg font-bold text-gray-800">Tambah Dompet Baru</h3>
         <button onclick="closeModals()" class="text-gray-400 hover:text-gray-600 bg-gray-200/50 hover:bg-gray-200 transition-colors rounded-full p-1"><i class="ph ph-x text-lg"></i></button>
       </div>
-      <div class="p-5">
-        <form id="form-wallet" class="space-y-4">
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nama Dompet</label><input type="text" id="wallet-name" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none" placeholder="BCA / Tunai / Gopay"></div>
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Saldo Awal</label><input type="number" id="wallet-balance" required step="any" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Warna Label</label><input type="color" id="wallet-color" value="#4F46E5" class="w-full h-12 border border-gray-300 rounded-xl p-1 cursor-pointer bg-white"></div>
-          <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 transition-opacity text-white py-3 rounded-xl font-bold mt-2 shadow-md">Simpan Dompet</button>
+      <div class="p-6">
+        <form id="form-wallet" class="space-y-5">
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Dompet</label><input type="text" id="wallet-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium" placeholder="BCA / Tunai / Dana"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Saldo Saat Ini</label><input type="number" id="wallet-balance" required step="any" value="0" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Warna Identifikasi</label><input type="color" id="wallet-color" value="#3B82F6" class="w-full h-14 border-2 border-gray-200 rounded-xl p-1 cursor-pointer bg-white"></div>
+          <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 transition-opacity text-white py-3.5 rounded-xl font-bold mt-2 shadow-md">Simpan Dompet</button>
         </form>
       </div>
     </div>
 
     <!-- MODAL: ADD GOAL & UPDATE GOAL -->
-    <div id="modal-add-goal" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
+    <div id="modal-add-goal" class="bg-white rounded-3xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-        <h3 class="text-lg font-bold text-gray-800">Buat Target</h3>
+        <h3 class="text-lg font-bold text-gray-800">Buat Target Finansial</h3>
         <button onclick="closeModals()" class="text-gray-400 hover:text-gray-600 bg-gray-200/50 hover:bg-gray-200 transition-colors rounded-full p-1"><i class="ph ph-x text-lg"></i></button>
       </div>
-      <div class="p-5">
+      <div class="p-6">
         <form id="form-goal" class="space-y-4">
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nama Target</label><input type="text" id="goal-name" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none" placeholder="Beli Laptop / Dana Darurat"></div>
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Jumlah Target</label><input type="number" id="goal-target" required min="1" step="any" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Sudah Terkumpul</label><input type="number" id="goal-saved" min="0" step="any" value="0" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none"></div>
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Target Selesai (Opsional)</label><input type="month" id="goal-deadline" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none text-gray-700"></div>
-          <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 transition-opacity text-white py-3 rounded-xl font-bold mt-2 shadow-md">Buat Target</button>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Untuk Apa?</label><input type="text" id="goal-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium" placeholder="Beli Laptop / DP Rumah"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Butuh Berapa?</label><input type="number" id="goal-target" required min="1" step="any" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sudah Ada (Awal)</label><input type="number" id="goal-saved" min="0" step="any" value="0" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Target Selesai</label><input type="month" id="goal-deadline" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none text-gray-700 font-medium"></div>
+          <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 transition-opacity text-white py-3.5 rounded-xl font-bold mt-2 shadow-md">Simpan Target</button>
         </form>
       </div>
     </div>
 
-    <div id="modal-update-goal" class="bg-white rounded-2xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
+    <div id="modal-update-goal" class="bg-white rounded-3xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
-        <h3 class="text-lg font-bold text-gray-800">Tambah Tabungan</h3>
+        <h3 class="text-lg font-bold text-gray-800">Setor Tabungan</h3>
         <button onclick="closeModals()" class="text-gray-400 hover:text-gray-600 bg-gray-200/50 hover:bg-gray-200 transition-colors rounded-full p-1"><i class="ph ph-x text-lg"></i></button>
       </div>
-      <div class="p-5">
+      <div class="p-6">
         <form id="form-update-goal" class="space-y-4">
           <input type="hidden" id="update-goal-id">
-          <div><label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Jumlah yang ditabung</label><input type="number" id="update-goal-amount" required min="1" step="any" class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 outline-none" placeholder="0"></div>
-          <button type="submit" class="w-full bg-success hover:bg-emerald-600 transition-colors text-white py-3 rounded-xl font-bold mt-2 shadow-md">Simpan</button>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Disetor</label><input type="number" id="update-goal-amount" required min="1" step="any" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium" placeholder="0"></div>
+          <button type="submit" class="w-full bg-success hover:bg-emerald-600 transition-colors text-white py-3.5 rounded-xl font-bold mt-4 shadow-lg shadow-emerald-200">Tambahkan Progres</button>
         </form>
       </div>
     </div>
   </div>
 
   <!-- CUSTOM CONFIRM DIALOG -->
-  <div id="confirm-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center transform transition-transform scale-95" id="confirm-box">
-      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-danger"><i class="ph ph-warning-circle text-4xl"></i></div>
-      <h3 class="text-xl font-bold text-gray-800 mb-2">Konfirmasi Tindakan</h3>
-      <p id="confirm-msg" class="text-gray-600 mb-6 text-sm">Apakah Anda yakin?</p>
+  <div id="confirm-overlay" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6 text-center transform transition-transform scale-95" id="confirm-box">
+      <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-danger border-4 border-red-100"><i class="ph ph-warning-circle text-3xl"></i></div>
+      <h3 class="text-xl font-bold text-gray-900 mb-2">Konfirmasi Tindakan</h3>
+      <p id="confirm-msg" class="text-gray-500 mb-8 text-sm">Apakah Anda yakin?</p>
       <div class="flex gap-3 w-full">
-        <button id="confirm-btn-no" class="flex-1 py-2.5 rounded-xl border border-gray-300 text-gray-700 font-semibold hover:bg-gray-50 transition-colors">Batal</button>
-        <button id="confirm-btn-yes" class="flex-1 py-2.5 rounded-xl bg-danger text-white font-semibold hover:bg-red-600 transition-colors shadow-md shadow-red-200">Ya, Hapus</button>
+        <button id="confirm-btn-no" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors">Batal</button>
+        <button id="confirm-btn-yes" class="flex-1 py-3 rounded-xl bg-danger text-white font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-200">Ya, Hapus</button>
       </div>
     </div>
   </div>
 
-  <!-- PWA INSTALL POPUP BANNER (ANDROID PWA) -->
-  <div id="pwa-install-banner" class="fixed bottom-24 md:bottom-6 left-1/2 transform -translate-x-1/2 z-[80] w-[95%] max-w-sm hidden install-popup-anim">
-    <div class="bg-white rounded-2xl shadow-[0_20px_50px_rgba(8,112,184,0.3)] border-2 border-indigo-100 p-5 flex flex-col gap-4 relative overflow-hidden">
-      <!-- Glow effect -->
-      <div class="dynamic-bg absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-2xl"></div>
+  <!-- MODAL: POP UP INSTALL PWA KHUSUS -->
+  <div id="modal-pwa-install" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden flex items-end md:items-center justify-center pb-0 md:p-4 transition-opacity duration-300 opacity-0">
+    <!-- Panel Install (Bottom sheet di mobile, Center modal di Desktop) -->
+    <div id="pwa-panel" class="bg-white w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden transform translate-y-full md:translate-y-10 transition-transform duration-500 ease-out flex flex-col relative">
       
-      <div class="flex items-start gap-4 relative z-10">
-        <img src="https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg" alt="App Icon" class="w-14 h-14 rounded-2xl object-cover shadow-lg shadow-gray-200 flex-shrink-0 border border-gray-100">
-        <div>
-          <h3 class="font-bold text-gray-800 text-lg flex items-center gap-1">
-            Instal <span id="banner-app-name" class="dynamic-text text-primary">FinPro</span>
-          </h3>
-          <p class="text-xs text-gray-500 leading-relaxed mt-1">Jadikan sebagai Aplikasi Android. Akses super cepat, mendukung mode offline, dan tampil penuh tanpa address bar browser!</p>
+      <!-- Dekorasi Header -->
+      <div class="dynamic-bg absolute top-0 left-0 right-0 h-32 bg-primary z-0 rounded-t-3xl opacity-10"></div>
+      
+      <div class="p-6 relative z-10 flex flex-col items-center text-center mt-4">
+        <!-- Ikon App Besar -->
+        <div class="w-24 h-24 bg-white p-2 rounded-3xl shadow-xl border border-gray-100 mb-4 transform -translate-y-12 relative">
+          <img src="https://placehold.co/512x512/4F46E5/ffffff?text=FP" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
+          <!-- Badge Centang -->
+          <div class="absolute -bottom-2 -right-2 bg-success text-white w-8 h-8 rounded-full flex justify-center items-center border-4 border-white shadow-sm">
+            <i class="ph ph-check-circle text-lg"></i>
+          </div>
         </div>
-      </div>
-      <div class="flex gap-3 mt-1 relative z-10">
-        <button id="pwa-btn-dismiss" class="flex-1 py-2.5 rounded-xl text-gray-500 bg-gray-100 font-bold text-sm hover:bg-gray-200 transition-colors">Nanti Saja</button>
-        <button id="pwa-btn-install" class="dynamic-bg flex-1 py-2.5 rounded-xl text-white bg-primary font-bold text-sm hover:opacity-90 shadow-md transition-all flex items-center justify-center gap-2">
-          <i class="ph ph-android-logo text-lg"></i> Instal Sekarang
-        </button>
+
+        <h2 class="text-2xl font-black text-gray-900 -mt-8 mb-2">
+          Instal <span id="install-popup-app-name" class="dynamic-text text-primary">FinPro</span>
+        </h2>
+        <p class="text-sm text-gray-500 mb-6 px-4">
+          Bukan sekadar pintasan! Instal sebagai <b>Aplikasi Android Sesungguhnya (WebAPK)</b>. Akses lebih cepat, mendukung mode offline, dan layar penuh tanpa address bar browser.
+        </p>
+
+        <!-- Fitur Highlight -->
+        <div class="w-full bg-gray-50 rounded-2xl p-4 flex flex-col gap-3 mb-6 border border-gray-100 text-left">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex justify-center items-center"><i class="ph ph-lightning"></i></div>
+            <span class="text-sm font-semibold text-gray-700">Kinerja secepat aplikasi native</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex justify-center items-center"><i class="ph ph-wifi-slash"></i></div>
+            <span class="text-sm font-semibold text-gray-700">Tetap berfungsi saat offline</span>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex justify-center items-center"><i class="ph ph-app-window"></i></div>
+            <span class="text-sm font-semibold text-gray-700">Tampil mandiri di App Drawer</span>
+          </div>
+        </div>
+
+        <!-- Tombol Aksi -->
+        <div class="w-full flex flex-col gap-3">
+          <button id="pwa-btn-confirm-install" class="dynamic-bg w-full py-4 bg-primary text-white font-bold rounded-2xl text-lg shadow-lg shadow-primary/30 flex justify-center items-center gap-2 hover:scale-[1.02] transition-transform">
+            <i class="ph ph-download-simple text-xl"></i> Instal Aplikasi Sekarang
+          </button>
+          <button id="pwa-btn-cancel" class="w-full py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-2xl transition-colors">
+            Nanti Saja
+          </button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- TOAST CONTAINER -->
-  <div id="toast-container" class="fixed top-4 right-4 z-[70] flex flex-col gap-2 pointer-events-none"></div>
+  <div id="toast-container" class="fixed top-4 right-4 z-[110] flex flex-col gap-3 pointer-events-none"></div>
 
   <script>
     /* ================= PWA & WEB APP BUILDER LOGIC ================= */
     let currentManifestUrl = null;
     let deferredPrompt = null;
     
-    // Fungsi Web App Builder untuk membangun PWA secara dinamis
+    // Fungsi membuat gambar placeholder dinamis berdasarkan warna dan teks
+    function getGeneratedIconUrl(text, bgColorHex) {
+      const color = bgColorHex.replace('#', '');
+      return `https://placehold.co/512x512/${color}/ffffff?text=${text.substring(0,2).toUpperCase()}`;
+    }
+
+    // Fungsi Web App Builder untuk membangun PWA dinamis & WebAPK compliant
     function buildPWA(appName, themeColor) {
+      const iconUrl = getGeneratedIconUrl(appName, themeColor);
+      
+      // Update semua icon di UI
+      document.querySelectorAll('.app-logo-img').forEach(img => {
+        img.src = iconUrl;
+      });
+
       const manifestContent = {
         "name": appName,
         "short_name": appName,
-        "start_url": window.location.href.split('?')[0],
+        // Start URL harus merujuk ke path saat ini agar WebAPK valid
+        "start_url": window.location.pathname + window.location.search,
         "display": "standalone",
+        "orientation": "portrait",
         "background_color": "#F3F4F6",
         "theme_color": themeColor,
-        "description": "Sistem Manajemen Keuangan Profesional",
+        "description": "Aplikasi Manajemen Keuangan Cerdas",
+        // Prefer related applications false untuk memastikan ini WebAPK bukan mengarah ke Playstore eksternal
+        "prefer_related_applications": false,
         "icons": [
           {
-            "src": "https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg",
+            "src": iconUrl,
             "sizes": "192x192",
-            "type": "image/jpeg",
+            "type": "image/png",
             "purpose": "any maskable"
           },
           {
-            "src": "https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg",
+            "src": iconUrl,
             "sizes": "512x512",
-            "type": "image/jpeg",
+            "type": "image/png",
             "purpose": "any maskable"
           }
         ]
@@ -520,32 +553,30 @@
       if(currentManifestUrl) URL.revokeObjectURL(currentManifestUrl);
       currentManifestUrl = URL.createObjectURL(blobManifest);
 
-      // Hapus manifest lama jika ada
+      // Ganti / Pasang manifest baru
       let oldLink = document.querySelector('link[rel="manifest"]');
       if(oldLink) oldLink.remove();
-
-      // Pasang manifest baru
-      document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${currentManifestUrl}">`);
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = currentManifestUrl;
+      document.head.appendChild(manifestLink);
       
       // Update Meta Theme Color
       document.getElementById('meta-theme-color').setAttribute('content', themeColor);
       
-      // Update UI Text & CSS Root variables untuk menyesuaikan dengan warna builder
+      // Update UI Teks
       document.getElementById('sidebar-app-name').innerText = appName;
       document.getElementById('mobile-app-name').innerText = appName;
-      document.getElementById('banner-app-name').innerText = appName;
-      document.title = `${appName} - Sistem Keuangan`;
+      document.getElementById('install-popup-app-name').innerText = appName;
+      document.title = `${appName} - Financial App`;
 
-      // Apply dynamic colors
+      // Aplikasikan warna dinamis (Builder)
       document.documentElement.style.setProperty('--theme-color', themeColor);
-      document.querySelectorAll('.dynamic-bg').forEach(el => {
-          el.style.backgroundColor = themeColor;
-      });
-      document.querySelectorAll('.dynamic-text').forEach(el => {
-          el.style.color = themeColor;
-      });
+      document.querySelectorAll('.dynamic-bg').forEach(el => { el.style.backgroundColor = themeColor; });
+      document.querySelectorAll('.dynamic-text').forEach(el => { el.style.color = themeColor; });
+      document.querySelectorAll('.dynamic-border').forEach(el => { el.style.borderColor = themeColor; });
       document.querySelectorAll('.dynamic-gradient-bg').forEach(el => {
-         el.style.backgroundImage = `linear-gradient(to right, ${themeColor}, #9333EA)`;
+         el.style.backgroundImage = `linear-gradient(135deg, ${themeColor}, #000000 200%)`;
       });
     }
 
@@ -555,82 +586,106 @@
        const themeColor = document.getElementById('builder-color').value || "#4F46E5";
        
        buildPWA(appName, themeColor);
-       showToast("Identitas Web App berhasil diterapkan!");
+       saveSettings(); // Simpan juga ke state storage
        
-       // Trigger install banner for visibility
-       setTimeout(() => {
-           document.getElementById('pwa-install-banner').classList.remove('hidden');
-       }, 800);
+       showToast("Identitas Web App berhasil diterapkan! Siap diinstal.", "success");
     });
 
-    // 2. Dummy Service Worker for PWA compliance in one-file constraint
+    // Registrasi Service Worker untuk syarat mutlak PWA Android
     if ('serviceWorker' in navigator) {
+      // Menggunakan fetch event sederhana agar browser mendeteksi kapabilitas offline
       const swCode = `
-        const CACHE_NAME = 'finpro-pwa-v1';
-        self.addEventListener('install', (e) => {
-           self.skipWaiting();
-        });
+        const CACHE_NAME = 'finpro-webapk-v2';
+        self.addEventListener('install', (e) => self.skipWaiting());
         self.addEventListener('activate', (e) => self.clients.claim());
         self.addEventListener('fetch', (e) => {
           e.respondWith(
-            fetch(e.request).catch(() => new Response('Offline mode active', { status: 200 }))
+            fetch(e.request).catch(() => new Response('Aplikasi sedang berjalan dalam mode Offline.', { status: 200, headers: {'Content-Type':'text/plain'} }))
           );
         });
       `;
       const blobSW = new Blob([swCode], {type: 'application/javascript'});
       const swUrl = URL.createObjectURL(blobSW);
+      // Registrasi tanpa menyertakan spesifik scope memastikan default direktori file HTML
       navigator.serviceWorker.register(swUrl).then(reg => {
-        console.log('Service Worker Registered (PWA Mode Active)');
+        console.log('Service Worker Registered - PWA Ready');
       }).catch(err => console.log('SW Reg Failed', err));
     }
 
-    // 3. PWA Install Prompt Logic
-    const installBanner = document.getElementById('pwa-install-banner');
-    const btnInstall = document.getElementById('pwa-btn-install');
-    const btnDismiss = document.getElementById('pwa-btn-dismiss');
-    const btnInstallSettings = document.getElementById('btn-install-settings');
+    const installModal = document.getElementById('modal-pwa-install');
+    const installPanel = document.getElementById('pwa-panel');
+    const btnTriggerModal = document.getElementById('btn-trigger-install-modal');
+    const btnConfirmInstall = document.getElementById('pwa-btn-confirm-install');
+    const btnCancelInstall = document.getElementById('pwa-btn-cancel');
 
+    // Mencegah prompt instalasi otomatis Chrome
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      // Munculkan popup banner kustom otomatis setelah 2 detik pertama kali
-      setTimeout(() => {
-        installBanner.classList.remove('hidden');
-      }, 2000);
+      console.log('beforeinstallprompt tertangkap. Siap menginstal aplikasi.');
     });
 
-    const triggerInstall = async () => {
+    // Fungsi membuka Popup Modal Kustom
+    function openInstallModal() {
+      installModal.classList.remove('hidden');
+      // Trigger reflow & animation
+      setTimeout(() => {
+        installModal.classList.remove('opacity-0');
+        installPanel.classList.remove('translate-y-full', 'md:translate-y-10');
+        installPanel.classList.add('translate-y-0');
+      }, 10);
+    }
+
+    function closeInstallModal() {
+      installPanel.classList.remove('translate-y-0');
+      installPanel.classList.add('translate-y-full', 'md:translate-y-10');
+      installModal.classList.add('opacity-0');
+      setTimeout(() => {
+        installModal.classList.add('hidden');
+      }, 300); // Waktu yang sama dengan durasi transisi Tailwind
+    }
+
+    // Tombol di dalam halaman "Pengaturan" untuk memicu popup
+    btnTriggerModal.addEventListener('click', () => {
+      openInstallModal();
+    });
+
+    // Tombol di dalam popup modal untuk benar-benar menginstal via Chrome
+    btnConfirmInstall.addEventListener('click', async () => {
       if (deferredPrompt) {
-        installBanner.classList.add('hidden');
+        closeInstallModal();
+        // Menampilkan prompt native Android/Chrome
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
+        if(outcome === 'accepted') {
+          showToast("Proses Instalasi WebAPK Dimulai...", "success");
+        } else {
+          showToast("Instalasi dibatalkan.", "warning");
+        }
         deferredPrompt = null;
       } else {
-        showToast("Buka dari Google Chrome dan pilih 'Tambahkan ke Layar Utama' (Add to Home Screen).", "warning");
-        installBanner.classList.add('hidden');
+        // Fallback jika tidak ada prompt (misal: iOS atau sudah terinstal)
+        closeInstallModal();
+        showToast("Perangkat Anda tidak memicu prompt, atau aplikasi sudah terinstal. Jika di Chrome Android, cek menu titik tiga > Tambahkan ke Layar Utama.", "warning");
       }
-    };
+    });
 
-    btnInstall.addEventListener('click', triggerInstall);
-    btnInstallSettings.addEventListener('click', triggerInstall);
-
-    btnDismiss.addEventListener('click', () => {
-      installBanner.classList.add('hidden');
+    btnCancelInstall.addEventListener('click', closeInstallModal);
+    
+    // Tutup jika klik area background modal
+    installModal.addEventListener('click', (e) => {
+      if(e.target === installModal) closeInstallModal();
     });
 
     window.addEventListener('appinstalled', () => {
-      installBanner.classList.add('hidden');
-      showToast("Berhasil diinstal! FinPro sekarang tersedia di layar utama Anda.");
+      closeInstallModal();
+      showToast("🎉 Yey! Aplikasi berhasil diinstal di perangkat Anda.", "success");
       deferredPrompt = null;
     });
 
-    // Jalankan build PWA awal
-    buildPWA('FinPro', '#4F46E5');
 
-
-    /* ================= STREAMING_CHUNK:Data Management & Core State... ================= */
-    const STORAGE_KEY = 'finpro_data_v2';
+    /* ================= STREAMING_CHUNK:Manajemen Data & State Aplikasi... ================= */
+    const STORAGE_KEY = 'finpro_data_v3';
     
     const defaultCategories = [
       { id: 'c1', name: 'Makanan & Minuman', type: 'expense', icon: 'hamburger', color: '#F59E0B' },
@@ -641,15 +696,15 @@
       { id: 'c6', name: 'Hiburan', type: 'expense', icon: 'film-strip', color: '#14B8A6' },
       { id: 'c7', name: 'Gaji', type: 'income', icon: 'money', color: '#10B981' },
       { id: 'c8', name: 'Investasi', type: 'income', icon: 'chart-line-up', color: '#0EA5E9' },
-      { id: 'c9', name: 'Lainnya', type: 'income', icon: 'plus-circle', color: '#6B7280' },
-      { id: 'c10', name: 'Lainnya', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
+      { id: 'c9', name: 'Pemasukan Lain', type: 'income', icon: 'plus-circle', color: '#6B7280' },
+      { id: 'c10', name: 'Pengeluaran Lain', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
     ];
 
     const defaultState = {
       settings: { currency: 'IDR', appName: 'FinPro', themeColor: '#4F46E5' },
       wallets: [
-        { id: 'w1', name: 'Tunai', balance: 0, color: '#10B981' },
-        { id: 'w2', name: 'Rekening Bank', balance: 0, color: '#3B82F6' }
+        { id: 'w1', name: 'Dompet Tunai', balance: 0, color: '#10B981' },
+        { id: 'w2', name: 'Rekening Utama', balance: 0, color: '#3B82F6' }
       ],
       categories: defaultCategories,
       transactions: [],
@@ -682,19 +737,20 @@
 
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
 
-    /* ================= STREAMING_CHUNK:Helpers & Navigations... ================= */
+    /* ================= STREAMING_CHUNK:Navigasi dan Fungsi Pendukung... ================= */
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
-      let bg = type === 'success' ? 'bg-gray-800' : (type === 'warning' ? 'bg-warning' : 'bg-danger');
-      let icon = type === 'success' ? 'check-circle' : 'warning-circle';
-      toast.className = `toast-enter ${bg} text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 pointer-events-auto max-w-sm`;
-      toast.innerHTML = `<i class="ph ph-${icon} text-xl"></i><span class="text-sm font-medium">${message}</span>`;
+      let bg = type === 'success' ? 'bg-gray-900 border-l-4 border-success' : (type === 'warning' ? 'bg-gray-900 border-l-4 border-warning' : 'bg-danger text-white border-l-4 border-white');
+      let icon = type === 'success' ? 'check-circle text-success' : (type === 'warning' ? 'warning text-warning' : 'warning-circle text-white');
+      
+      toast.className = `toast-enter ${bg} text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 pointer-events-auto max-w-sm mb-2 backdrop-blur-md bg-opacity-95`;
+      toast.innerHTML = `<i class="ph ph-${icon} text-2xl"></i><span class="text-sm font-semibold">${message}</span>`;
       container.appendChild(toast);
       setTimeout(() => {
         toast.classList.replace('toast-enter', 'toast-exit');
         setTimeout(() => toast.remove(), 300);
-      }, 3500);
+      }, 4000);
     }
 
     let confirmCallback = null;
@@ -735,30 +791,41 @@
       const target = document.getElementById(`view-${tabId}`);
       if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
 
+      // Desktop Nav update
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-gray-50'));
       const desktopNav = document.getElementById(`nav-${tabId}`);
       if(desktopNav) desktopNav.classList.add('active');
 
+      // Mobile Nav update
       const mobNav = document.getElementById(`mob-${tabId}`);
       if(mobNav) {
         document.querySelectorAll('nav.md\\:hidden .nav-item').forEach(el => { 
             el.classList.remove('active'); 
             el.classList.add('text-gray-500'); 
-            el.style.color = ''; // Reset inline color
+            el.style.color = ''; 
         });
         mobNav.classList.remove('text-gray-500'); 
         mobNav.classList.add('active');
-        // Apply theme color to active mobile nav
-        const themeColor = document.getElementById('builder-color').value || '#4F46E5';
+        const themeColor = state.settings.themeColor || '#4F46E5';
         mobNav.style.color = themeColor;
       }
       if(tabId === 'dashboard') initCharts();
     }
 
+    /* ================= STREAMING_CHUNK:Logika Form Modal (DOM & Data)... ================= */
     function openModal(modalId) {
-      document.getElementById('modal-overlay').classList.remove('hidden');
-      document.getElementById(`modal-${modalId}`).classList.remove('hidden');
-      document.getElementById(`modal-${modalId}`).classList.add('modal-enter-active');
+      const modalOverlay = document.getElementById('modal-overlay');
+      const targetModal = document.getElementById(`modal-${modalId}`);
+      
+      modalOverlay.classList.remove('hidden');
+      targetModal.classList.remove('hidden');
+      
+      // Delay for transition
+      setTimeout(() => {
+         modalOverlay.classList.add('modal-enter-active');
+         targetModal.classList.add('modal-enter-active');
+      }, 10);
+
       if(modalId === 'add-transaction') {
         document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
         setTxType('expense'); populateSelects();
@@ -767,12 +834,22 @@
     }
 
     function closeModals() {
-      document.getElementById('modal-overlay').classList.add('hidden');
-      document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { el.classList.add('hidden'); el.classList.remove('modal-enter-active'); });
+      const modalOverlay = document.getElementById('modal-overlay');
+      modalOverlay.classList.remove('modal-enter-active');
+      
+      document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { 
+          el.classList.remove('modal-enter-active'); 
+      });
+      
+      setTimeout(() => {
+          modalOverlay.classList.add('hidden');
+          document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { 
+             el.classList.add('hidden');
+          });
+      }, 300); // Wait for transition
     }
     document.getElementById('modal-overlay').addEventListener('click', (e) => { if(e.target.id === 'modal-overlay') closeModals(); });
 
-    /* ================= STREAMING_CHUNK:App Logic & Form Handling... ================= */
     function setTxType(type) {
       document.getElementById('tx-type').value = type;
       const btns = { 'expense': document.getElementById('btn-type-expense'), 'income': document.getElementById('btn-type-income'), 'transfer': document.getElementById('btn-type-transfer') };
@@ -780,18 +857,18 @@
       
       const wrapFrom = document.getElementById('wrap-wallet-from');
       if(type === 'expense') {
-        btns[type].className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-white shadow text-danger transition-all';
+        btns[type].className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-danger transition-all';
         document.getElementById('wrap-category').classList.remove('hidden'); document.getElementById('wrap-wallet-to').classList.add('hidden');
         wrapFrom.className = "col-span-2"; document.getElementById('lbl-wallet-from').innerText = "Gunakan Dompet";
         document.getElementById('tx-wallet').required = true; document.getElementById('tx-wallet-to').required = false;
       } else if (type === 'income') {
-        btns[type].className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-white shadow text-success transition-all';
+        btns[type].className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow text-success transition-all';
         document.getElementById('wrap-category').classList.remove('hidden'); document.getElementById('wrap-wallet-to').classList.add('hidden');
         wrapFrom.className = "col-span-2"; document.getElementById('lbl-wallet-from').innerText = "Masuk Ke Dompet";
         document.getElementById('tx-wallet').required = true; document.getElementById('tx-wallet-to').required = false;
       } else if (type === 'transfer') {
-        const themeColor = document.getElementById('builder-color').value || '#4F46E5';
-        btns[type].className = 'flex-1 py-2 text-sm font-medium rounded-lg bg-white shadow transition-all';
+        const themeColor = state.settings.themeColor || '#4F46E5';
+        btns[type].className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow transition-all';
         btns[type].style.color = themeColor;
         document.getElementById('wrap-category').classList.add('hidden'); document.getElementById('wrap-wallet-to').classList.remove('hidden');
         wrapFrom.className = ""; document.getElementById('lbl-wallet-from').innerText = "Dari Dompet";
@@ -815,11 +892,11 @@
       const date = document.getElementById('tx-date').value; const note = document.getElementById('tx-note').value.trim();
       const walletId = document.getElementById('tx-wallet').value;
       let wallet = state.wallets.find(w => w.id === walletId);
-      if(!wallet) return showToast("Pilih dompet yang valid", "error");
+      if(!wallet) return showToast("Pilih dompet yang valid", "warning");
 
       if (type === 'transfer') {
         const toWalletId = document.getElementById('tx-wallet-to').value;
-        if(walletId === toWalletId) return showToast("Dompet asal dan tujuan tidak boleh sama", "error");
+        if(walletId === toWalletId) return showToast("Dompet asal dan tujuan tidak boleh sama", "warning");
         let toWallet = state.wallets.find(w => w.id === toWalletId);
         wallet.balance -= amount; toWallet.balance += amount;
         state.transactions.push({ id: generateId(), type, amount, date, walletId, toWalletId, note: note || `Transfer ke ${toWallet.name}`, timestamp: Date.now() });
@@ -849,7 +926,7 @@
     });
     
     function deleteWallet(id) {
-       if(state.wallets.length <= 1) return showToast("Anda harus memiliki setidaknya satu dompet.", "error");
+       if(state.wallets.length <= 1) return showToast("Anda harus memiliki setidaknya satu dompet.", "warning");
        showConfirm("Yakin hapus dompet ini?", () => { state.wallets = state.wallets.filter(w => w.id !== id); saveData(); showToast("Dompet dihapus"); });
     }
 
@@ -863,17 +940,15 @@
     
     document.getElementById('form-update-goal').addEventListener('submit', (e) => {
       e.preventDefault(); const id = document.getElementById('update-goal-id').value; const amount = parseFloat(document.getElementById('update-goal-amount').value);
-      let goal = state.goals.find(g => g.id === id); if(goal && amount > 0) { goal.saved += amount; saveData(); closeModals(); showToast("Progres ditambahkan!"); }
+      let goal = state.goals.find(g => g.id === id); if(goal && amount > 0) { goal.saved += amount; saveData(); closeModals(); showToast("Tabungan ditambahkan!"); }
     });
 
-    /* ================= STREAMING_CHUNK:Rendering View... ================= */
+    /* ================= STREAMING_CHUNK:Sistem Rendering & Inisialisasi UI... ================= */
     function renderApp() {
-      // Load Builder Settings
-      if(state.settings.appName || state.settings.themeColor) {
-         document.getElementById('builder-name').value = state.settings.appName || "FinPro";
-         document.getElementById('builder-color').value = state.settings.themeColor || "#4F46E5";
-         buildPWA(document.getElementById('builder-name').value, document.getElementById('builder-color').value);
-      }
+      // Setup Web App Builder berdasar state settings
+      document.getElementById('builder-name').value = state.settings.appName;
+      document.getElementById('builder-color').value = state.settings.themeColor;
+      buildPWA(state.settings.appName, state.settings.themeColor);
 
       const dashMonth = document.getElementById('filter-month').value || getCurrentMonthStr(); document.getElementById('filter-month').value = dashMonth;
       const txMonth = document.getElementById('filter-month-tx').value || getCurrentMonthStr(); document.getElementById('filter-month-tx').value = txMonth;
@@ -900,29 +975,29 @@
           <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
             <div class="w-2 h-full absolute left-0 top-0" style="background-color: ${w.color}"></div>
             <div class="pl-4 flex justify-between items-start">
-               <div><h3 class="text-lg font-bold text-gray-800">${w.name}</h3><p class="text-2xl font-bold text-gray-900 mt-2">${formatMoney(w.balance)}</p></div>
-               <button onclick="deleteWallet('${w.id}')" title="Hapus Dompet" class="text-gray-300 hover:text-danger hover:bg-red-50 p-2 rounded-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-all"><i class="ph ph-trash text-xl"></i></button>
+               <div><h3 class="text-lg font-bold text-gray-800">${w.name}</h3><p class="text-2xl font-black text-gray-900 mt-2">${formatMoney(w.balance)}</p></div>
+               <button onclick="deleteWallet('${w.id}')" title="Hapus Dompet" class="text-gray-300 hover:text-danger hover:bg-red-50 p-2 rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all"><i class="ph ph-trash text-xl"></i></button>
             </div>
           </div>`;
       });
 
       const goalsGrid = document.getElementById('goals-grid'); goalsGrid.innerHTML = '';
-      if(state.goals.length === 0) goalsGrid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed text-gray-500"><i class="ph ph-target text-4xl mb-3 text-gray-300"></i><br>Belum ada target finansial.<br>Mulai menabung untuk impianmu!</div>`;
-      const themeColor = document.getElementById('builder-color').value || '#4F46E5';
+      if(state.goals.length === 0) goalsGrid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed text-gray-500"><i class="ph ph-target text-5xl mb-3 text-gray-300"></i><br>Belum ada target finansial.<br>Mulai menabung untuk impianmu!</div>`;
+      const themeColor = state.settings.themeColor;
       state.goals.forEach(g => {
         const percent = Math.min(100, Math.round((g.saved / g.target) * 100)); const isComplete = percent >= 100;
         goalsGrid.innerHTML += `
-          <div class="bg-white p-5 rounded-2xl border ${isComplete ? 'border-success/30 bg-success/5' : 'border-gray-100'} shadow-sm relative group hover:shadow-md transition-shadow">
+          <div class="bg-white p-5 rounded-2xl border ${isComplete ? 'border-success/40 bg-success/5 shadow-success/10' : 'border-gray-100'} shadow-sm relative group hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
-              <div><h3 class="text-lg font-bold text-gray-800">${g.name}</h3>${g.deadline ? `<p class="text-xs text-gray-500 mt-1 flex items-center gap-1"><i class="ph ph-calendar"></i> ${g.deadline}</p>` : ''}</div>
+              <div><h3 class="text-lg font-bold text-gray-800">${g.name}</h3>${g.deadline ? `<p class="text-xs font-semibold text-gray-500 mt-1 flex items-center gap-1"><i class="ph ph-calendar"></i> Selesai: ${g.deadline}</p>` : ''}</div>
               <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                ${!isComplete ? `<button onclick="openUpdateGoal('${g.id}')" title="Tambah Tabungan" class="text-gray-400 hover:text-success hover:bg-emerald-50 bg-white rounded-lg p-1.5 transition-colors"><i class="ph ph-plus text-lg"></i></button>` : ''}
-                <button onclick="deleteGoal('${g.id}')" title="Hapus Target" class="text-gray-400 hover:text-danger hover:bg-red-50 bg-white rounded-lg p-1.5 transition-colors"><i class="ph ph-trash text-lg"></i></button>
+                ${!isComplete ? `<button onclick="openUpdateGoal('${g.id}')" title="Setor Tabungan" class="text-gray-400 hover:text-success hover:bg-success/10 bg-white rounded-lg p-2 transition-colors"><i class="ph ph-plus text-lg"></i></button>` : ''}
+                <button onclick="deleteGoal('${g.id}')" title="Hapus Target" class="text-gray-400 hover:text-danger hover:bg-danger/10 bg-white rounded-lg p-2 transition-colors"><i class="ph ph-trash text-lg"></i></button>
               </div>
             </div>
-            <div class="mb-2 flex justify-between text-sm font-medium"><span class="text-gray-700">${formatMoney(g.saved)}</span><span class="text-gray-400">${formatMoney(g.target)}</span></div>
-            <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden"><div class="h-2.5 rounded-full ${isComplete ? 'bg-success' : 'dynamic-bg transition-all'}" style="width: ${percent}%; ${!isComplete ? 'background-color:'+themeColor+';' : ''} transition: all 1s ease-out"></div></div>
-            <p class="text-xs text-right mt-2 font-semibold ${isComplete ? 'text-success' : 'dynamic-text'}" style="${!isComplete ? 'color:'+themeColor+';' : ''}">${percent}% Terkumpul ${isComplete ? '🎉' : ''}</p>
+            <div class="mb-2 flex justify-between text-sm font-bold"><span class="text-gray-800">${formatMoney(g.saved)}</span><span class="text-gray-400">${formatMoney(g.target)}</span></div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden"><div class="h-3 rounded-full ${isComplete ? 'bg-success' : 'dynamic-bg transition-all'}" style="width: ${percent}%; ${!isComplete ? 'background-color:'+themeColor+';' : ''} transition: width 1s ease-out"></div></div>
+            <p class="text-xs text-right mt-2 font-bold ${isComplete ? 'text-success' : 'dynamic-text'}" style="${!isComplete ? 'color:'+themeColor+';' : ''}">${percent}% Terkumpul ${isComplete ? '🎉' : ''}</p>
           </div>`;
       });
       document.getElementById('setting-currency').value = state.settings.currency;
@@ -931,31 +1006,31 @@
 
     function renderTransactionList(containerId, txArray, isCompact = false) {
       const container = document.getElementById(containerId);
-      if(txArray.length === 0) return container.innerHTML = `<div class="p-8 text-center text-gray-400"><i class="ph ph-receipt text-4xl mb-2 opacity-50"></i><p>Tidak ada transaksi.</p></div>`;
+      if(txArray.length === 0) return container.innerHTML = `<div class="p-8 text-center text-gray-400 font-medium"><i class="ph ph-receipt text-5xl mb-2 text-gray-300"></i><p>Belum ada transaksi.</p></div>`;
       let html = '';
       txArray.forEach(t => {
         let iconHtml, title, colorClass, amountPrefix, walletName;
         if (t.type === 'expense' || t.type === 'income') {
           const cat = getCategory(t.categoryId);
-          iconHtml = `<div class="w-10 h-10 rounded-full flex items-center justify-center text-white" style="background-color: ${cat.color}"><i class="ph ph-${cat.icon} text-lg"></i></div>`;
+          iconHtml = `<div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-inner" style="background-color: ${cat.color}"><i class="ph ph-${cat.icon} text-2xl"></i></div>`;
           title = cat.name; colorClass = t.type === 'expense' ? 'text-gray-800' : 'text-success';
           amountPrefix = t.type === 'expense' ? '-' : '+'; walletName = getWallet(t.walletId).name;
         } else if (t.type === 'transfer') {
-           const themeColor = document.getElementById('builder-color').value || '#4F46E5';
-           iconHtml = `<div class="w-10 h-10 rounded-full flex items-center justify-center dynamic-text dynamic-border" style="color: ${themeColor}; background-color: ${themeColor}15; border: 1px solid ${themeColor}30;"><i class="ph ph-arrows-left-right text-lg"></i></div>`;
+           const themeColor = state.settings.themeColor;
+           iconHtml = `<div class="w-12 h-12 rounded-2xl flex items-center justify-center dynamic-text dynamic-border shadow-sm" style="color: ${themeColor}; background-color: ${themeColor}10; border: 1px solid ${themeColor}30;"><i class="ph ph-arrows-left-right text-2xl"></i></div>`;
            title = 'Transfer Saldo'; colorClass = 'text-gray-500'; amountPrefix = ''; walletName = `${getWallet(t.walletId).name} ➝ ${getWallet(t.toWalletId).name}`;
         }
-        const noteDisplay = t.note ? `<span class="text-xs text-gray-500 truncate max-w-[150px] md:max-w-[300px] inline-block font-normal border-l border-gray-300 pl-2 ml-2">${t.note}</span>` : '';
+        const noteDisplay = t.note ? `<span class="text-xs text-gray-500 truncate max-w-[150px] md:max-w-[300px] inline-block font-medium bg-gray-100 px-2 py-0.5 rounded ml-2">${t.note}</span>` : '';
         html += `
           <div class="p-4 hover:bg-gray-50 flex items-center justify-between group transition-colors">
-            <div class="flex items-center gap-4">${iconHtml}<div><p class="font-bold text-gray-800 flex items-center">${title} ${noteDisplay}</p><p class="text-xs text-gray-500 mt-0.5">${formatDate(t.date)} &bull; ${walletName}</p></div></div>
-            <div class="text-right flex items-center gap-3"><span class="font-bold ${colorClass}">${amountPrefix}${formatMoney(t.amount)}</span>${!isCompact ? `<button onclick="deleteTransaction('${t.id}')" title="Hapus Transaksi" class="text-gray-300 hover:text-danger hover:bg-red-50 p-1.5 rounded-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-all"><i class="ph ph-trash"></i></button>` : ''}</div>
+            <div class="flex items-center gap-4">${iconHtml}<div><p class="font-bold text-gray-800 flex items-center">${title} ${noteDisplay}</p><p class="text-xs font-semibold text-gray-500 mt-1">${formatDate(t.date)} &bull; ${walletName}</p></div></div>
+            <div class="text-right flex items-center gap-3"><span class="font-bold text-base ${colorClass}">${amountPrefix}${formatMoney(t.amount)}</span>${!isCompact ? `<button onclick="deleteTransaction('${t.id}')" title="Hapus" class="text-gray-300 hover:text-danger hover:bg-red-50 p-2 rounded-xl opacity-100 md:opacity-0 group-hover:opacity-100 transition-all"><i class="ph ph-trash"></i></button>` : ''}</div>
           </div>`;
       });
       container.innerHTML = html;
     }
 
-    /* ================= STREAMING_CHUNK:Chart.js Visualization & Init... ================= */
+    /* ================= STREAMING_CHUNK:Chart.js Visualization & Lainnya... ================= */
     function initCharts() {
       const cashflowCtx = document.getElementById('cashflowChart');
       if(cashflowCtx) {
@@ -972,8 +1047,8 @@
          }
          charts.cashflow = new Chart(cashflowCtx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Pemasukan', data: incomes, backgroundColor: '#10B981', borderRadius: 6, barPercentage: 0.6 }, { label: 'Pengeluaran', data: expenses, backgroundColor: '#EF4444', borderRadius: 6, barPercentage: 0.6 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {usePointStyle: true, boxWidth: 8, padding: 20} } }, scales: { y: { beginAtZero: true, border: {display: false}, grid: {color: '#f3f4f6'}, ticks: {callback: (v) => formatMoney(v).replace(/\.00$/, '')} }, x: { grid: {display: false} } }, interaction: { mode: 'index', intersect: false } }
+            data: { labels: labels, datasets: [{ label: 'Pemasukan', data: incomes, backgroundColor: '#10B981', borderRadius: 8, barPercentage: 0.6 }, { label: 'Pengeluaran', data: expenses, backgroundColor: '#EF4444', borderRadius: 8, barPercentage: 0.6 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {usePointStyle: true, boxWidth: 8, padding: 20, font:{weight:'bold'}} } }, scales: { y: { beginAtZero: true, border: {display: false}, grid: {color: '#f3f4f6'}, ticks: {callback: (v) => formatMoney(v).replace(/\.00$/, ''), font:{weight:'bold'}} }, x: { grid: {display: false}, ticks:{font:{weight:'bold'}} } }, interaction: { mode: 'index', intersect: false } }
          });
       }
 
@@ -990,7 +1065,7 @@
          if(data.length === 0) {
             charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: ['Belum ada pengeluaran'], datasets: [{ data: [1], backgroundColor: ['#F3F4F6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false}, tooltip: {enabled: false} }, cutout: '75%' } });
          } else {
-            charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 2, borderColor: '#ffffff', hoverOffset: 4 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: {usePointStyle: true, boxWidth: 8, font: {size: 11}} }, tooltip: { callbacks: { label: function(context) { return ' ' + formatMoney(context.raw); } } } } } });
+            charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 3, borderColor: '#ffffff', hoverOffset: 6 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: {usePointStyle: true, boxWidth: 8, font: {size: 11, weight:'bold'}} }, tooltip: { callbacks: { label: function(context) { return ' ' + formatMoney(context.raw); } } } } } });
          }
       }
     }
@@ -1000,29 +1075,29 @@
         state.settings.appName = document.getElementById('builder-name').value;
         state.settings.themeColor = document.getElementById('builder-color').value;
         saveData(); 
-        showToast("Preferensi berhasil disimpan!"); 
+        showToast("Preferensi berhasil disimpan!", "success"); 
     }
     
     function exportData() {
       const dataStr = JSON.stringify(state, null, 2); const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_FinPro_${new Date().toISOString().split('T')[0]}.json`); linkElement.click(); showToast("Backup diunduh");
+      const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_${state.settings.appName}_${new Date().toISOString().split('T')[0]}.json`); linkElement.click(); showToast("Backup data berhasil diunduh.", "success");
     }
     
     function importData(event) {
       const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
       reader.onload = function(e) {
-        try { const imported = JSON.parse(e.target.result); showConfirm("Yakin menimpa data?", () => { state = { ...defaultState, ...imported }; saveData(); showToast("Data dipulihkan!"); renderApp(); }); } 
-        catch (err) { showToast("File tidak valid.", "error"); } event.target.value = '';
+        try { const imported = JSON.parse(e.target.result); showConfirm("Aksi ini akan menimpa seluruh data Anda saat ini. Lanjutkan?", () => { state = { ...defaultState, ...imported }; saveData(); showToast("Data berhasil dipulihkan!", "success"); renderApp(); }); } 
+        catch (err) { showToast("File backup tidak valid / rusak.", "warning"); } event.target.value = '';
       }; reader.readAsText(file);
     }
     
-    function factoryReset() { showConfirm("Hapus semua data permanen?", () => { localStorage.removeItem(STORAGE_KEY); state = structuredClone(defaultState); saveData(); showToast("Sistem di-reset."); }); }
+    function factoryReset() { showConfirm("PERINGATAN: Semua data akan dihapus permanen. Lanjutkan?", () => { localStorage.removeItem(STORAGE_KEY); state = structuredClone(defaultState); saveData(); showToast("Sistem berhasil di-reset ke kondisi awal."); }); }
 
     document.getElementById('filter-month').addEventListener('change', renderApp);
     document.getElementById('filter-month-tx').addEventListener('change', renderApp);
     document.getElementById('filter-type').addEventListener('change', renderApp);
 
-    window.onload = () => { renderApp(); setTimeout(initCharts, 150); };
+    window.onload = () => { renderApp(); setTimeout(initCharts, 200); };
   </script>
 </body>
 </html>

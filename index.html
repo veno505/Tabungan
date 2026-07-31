@@ -74,258 +74,297 @@
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base">
 
-  <!-- Sidebar (Desktop) -->
-  <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10 relative">
-    <div class="p-6 flex items-center gap-3 border-b border-gray-100">
-      <img src="https://placehold.co/100x100/4F46E5/FFFFFF?text=FP" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
-      <h1 class="text-xl font-bold text-gray-800 tracking-tight" id="sidebar-app-name">FinPro</h1>
-    </div>
-    
-    <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-      <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors active">
-        <i class="ph ph-squares-four text-xl"></i><span>Dashboard</span>
-      </button>
-      <button onclick="switchTab('transactions')" id="nav-transactions" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
-        <i class="ph ph-list-dashes text-xl"></i><span>Transaksi</span>
-      </button>
-      <button onclick="switchTab('wallets')" id="nav-wallets" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
-        <i class="ph ph-wallet text-xl"></i><span>Dompet</span>
-      </button>
-      <button onclick="switchTab('goals')" id="nav-goals" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
-        <i class="ph ph-target text-xl"></i><span>Target</span>
-      </button>
-      <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
-        <i class="ph ph-gear text-xl"></i><span>Pengaturan App</span>
-      </button>
-    </nav>
-    
-    <div class="p-4 border-t border-gray-200">
-      <button onclick="openModal('add-transaction')" class="dynamic-bg w-full bg-primary hover:opacity-90 text-white py-3 rounded-xl shadow-md font-medium flex justify-center items-center gap-2 transition-all transform hover:-translate-y-0.5">
-        <i class="ph ph-plus-circle text-xl"></i>Catat Transaksi
-      </button>
-    </div>
-  </aside>
-
-  <!-- Main Content -->
-  <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-gray-50/50">
-    
-    <!-- Topbar (Mobile only) -->
-    <header class="md:hidden bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10">
-      <div class="flex items-center gap-2">
-        <img src="https://placehold.co/100x100/4F46E5/FFFFFF?text=FP" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
-        <h1 class="text-lg font-bold text-gray-800" id="mobile-app-name">FinPro</h1>
+  <!-- AUTHENTICATION VIEW -->
+  <div id="auth-container" class="flex h-screen w-full items-center justify-center bg-gray-50 fixed inset-0 z-[200]">
+    <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm border border-gray-100 mx-4">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 dynamic-bg-light dynamic-text">
+          <i class="ph ph-shield-check text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-800" id="auth-title">Masuk FinPro</h2>
+        <p class="text-sm text-gray-500 mt-2" id="auth-subtitle">Kelola keuangan sesuai gaya Anda.</p>
       </div>
-      <button onclick="openModal('add-transaction')" class="dynamic-bg bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
-        <i class="ph ph-plus text-lg"></i>
-      </button>
-    </header>
-
-    <!-- Scrollable Content Area -->
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8" id="main-scroll">
       
-      <!-- DASHBOARD VIEW -->
-      <section id="view-dashboard" class="space-y-6 block">
-        <div class="flex justify-between items-end">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-800">Ringkasan Keuangan</h2>
-            <p class="text-gray-500 mt-1" id="current-month-text">Bulan ini</p>
-          </div>
-          <input type="month" id="filter-month" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm outline-none">
+      <form id="form-auth" class="space-y-5">
+        <input type="hidden" id="auth-is-reg" value="false">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
+          <input type="text" id="auth-user" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium bg-gray-50 focus:bg-white transition-colors dynamic-focus" placeholder="Masukkan username">
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-4 opacity-10"><i class="ph ph-wallet text-6xl text-gray-800"></i></div>
-            <p class="text-gray-500 text-sm font-medium">Total Saldo (Semua Dompet)</p>
-            <h3 class="text-2xl font-bold text-gray-800 mt-1" id="dash-balance">Rp 0</h3>
-          </div>
-          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-             <div class="absolute top-0 right-0 p-4 opacity-10"><i class="ph ph-trend-up text-6xl text-success"></i></div>
-            <p class="text-gray-500 text-sm font-medium">Pemasukan Bulan Ini</p>
-            <h3 class="text-xl font-bold text-success mt-1" id="dash-income">Rp 0</h3>
-          </div>
-          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
-             <div class="absolute top-0 right-0 p-4 opacity-10"><i class="ph ph-trend-down text-6xl text-danger"></i></div>
-            <p class="text-gray-500 text-sm font-medium">Pengeluaran Bulan Ini</p>
-            <h3 class="text-xl font-bold text-danger mt-1" id="dash-expense">Rp 0</h3>
-          </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
+          <input type="password" id="auth-pass" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium bg-gray-50 focus:bg-white transition-colors dynamic-focus" placeholder="••••••••">
         </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Arus Kas (6 Bulan Terakhir)</h3>
-            <div class="relative h-64 w-full"><canvas id="cashflowChart"></canvas></div>
-          </div>
-          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Pengeluaran per Kategori</h3>
-            <div class="relative h-64 w-full flex justify-center items-center"><canvas id="categoryChart"></canvas></div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div class="p-5 border-b border-gray-100 flex justify-between items-center">
-            <h3 class="text-lg font-bold text-gray-800">Transaksi Terakhir</h3>
-            <button onclick="switchTab('transactions')" class="dynamic-text text-primary text-sm font-medium hover:underline">Lihat Semua</button>
-          </div>
-          <div id="recent-transactions-list" class="divide-y divide-gray-100"></div>
-        </div>
-      </section>
-
-      <section id="view-transactions" class="space-y-6 hidden">
-        <div class="flex justify-between items-center">
-          <h2 class="text-2xl font-bold text-gray-800">Riwayat Transaksi</h2>
-          <button onclick="openModal('add-transaction')" class="hidden md:flex dynamic-bg bg-primary hover:opacity-90 transition-opacity text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2">
-            <i class="ph ph-plus"></i> Transaksi Baru
-          </button>
-        </div>
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3 bg-gray-50/50">
-            <select id="filter-type" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
-              <option value="all">Semua Tipe</option>
-              <option value="income">Pemasukan</option>
-              <option value="expense">Pengeluaran</option>
-              <option value="transfer">Transfer Antar Dompet</option>
-            </select>
-            <input type="month" id="filter-month-tx" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
-          </div>
-          <div id="all-transactions-list" class="divide-y divide-gray-100"></div>
-        </div>
-      </section>
-
-      <section id="view-wallets" class="space-y-6 hidden">
-        <div class="flex justify-between items-center">
-          <h2 class="text-2xl font-bold text-gray-800">Kelola Dompet</h2>
-          <button onclick="openModal('add-wallet')" class="dynamic-bg bg-primary hover:opacity-90 transition-opacity text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
-            <i class="ph ph-plus"></i> Tambah Dompet
-          </button>
-        </div>
-        <div id="wallets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-      </section>
-
-      <section id="view-goals" class="space-y-6 hidden">
-        <div class="flex justify-between items-center">
-          <div>
-            <h2 class="text-2xl font-bold text-gray-800">Target Finansial</h2>
-            <p class="text-gray-500 text-sm mt-1">Capai impianmu langkah demi langkah</p>
-          </div>
-          <button onclick="openModal('add-goal')" class="dynamic-bg bg-primary hover:opacity-90 transition-opacity text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
-            <i class="ph ph-plus"></i> Buat Target
-          </button>
-        </div>
-        <div id="goals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </section>
-
-      <section id="view-settings" class="space-y-6 hidden max-w-3xl">
-        <h2 class="text-2xl font-bold text-gray-800">Pengaturan & Web App Builder</h2>
-
-        <!-- MODUL WEB APP BUILDER -->
-        <div class="dynamic-gradient-bg bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl shadow-lg overflow-hidden mb-6 text-white relative">
-          <!-- Dekorasi Latar -->
-          <div class="absolute -top-10 -right-10 p-8 opacity-20 pointer-events-none transform rotate-12">
-            <i class="ph ph-android-logo text-[180px]"></i>
-          </div>
-          
-          <div class="p-8 relative z-10">
-            <div class="flex items-center gap-3 mb-2">
-              <div class="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm border border-white/20">
-                <i class="ph ph-wrench text-2xl"></i>
-              </div>
-              <h3 class="text-2xl font-bold">App Builder</h3>
-            </div>
-            <p class="text-sm text-white/90 mb-8 max-w-md leading-relaxed">
-              Ubah identitas aplikasi sesuka Anda. Setelah diterapkan, klik <b>Instal</b> untuk menjadikan ini Aplikasi Android penuh (WebAPK) di perangkat Anda.
-            </p>
-            
-            <div class="space-y-5 max-w-md bg-black/10 p-6 rounded-2xl border border-white/10 backdrop-blur-md">
-              <div>
-                <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-2">Nama Aplikasi</label>
-                <input type="text" id="builder-name" value="FinPro" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-white outline-none transition-all font-medium text-lg">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-2">Warna Tema (Branding)</label>
-                <div class="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/10">
-                  <input type="color" id="builder-color" value="#4F46E5" class="w-12 h-12 border-2 border-white/30 rounded-lg cursor-pointer bg-transparent">
-                  <span class="text-sm font-medium text-white/90 flex-1">Menentukan warna dominan navbar & ikon.</span>
-                </div>
-              </div>
-              
-              <div class="pt-4 flex flex-col gap-3">
-                <button id="btn-apply-builder" class="w-full bg-white text-gray-900 py-3.5 rounded-xl font-bold shadow-lg shadow-black/10 hover:bg-gray-100 transition-all flex justify-center items-center gap-2 transform active:scale-95">
-                  <i class="ph ph-magic-wand text-xl"></i> Terapkan Perubahan
-                </button>
-                <button id="btn-trigger-install-modal" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white border border-emerald-400/50 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-emerald-900/20 transform active:scale-95">
-                  <i class="ph ph-download-simple text-xl"></i> Instal sebagai Aplikasi Android
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Preferensi Biasa -->
-        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div class="p-6 border-b border-gray-100">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Preferensi Umum</h3>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Mata Uang Default</label>
-                <select id="setting-currency" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none bg-gray-50">
-                  <option value="IDR">Rupiah (Rp)</option>
-                  <option value="USD">US Dollar ($)</option>
-                  <option value="EUR">Euro (€)</option>
-                </select>
-              </div>
-              <button onclick="saveSettings()" class="dynamic-bg bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-colors">
-                Simpan Preferensi
-              </button>
-            </div>
-          </div>
-
-          <div class="p-6 bg-gray-50/50">
-            <h3 class="text-lg font-bold text-gray-800 mb-2">Manajemen Data</h3>
-            <p class="text-sm text-gray-500 mb-5">Data disimpan secara lokal di memori perangkat Anda. Lakukan backup berkala.</p>
-            
-            <div class="flex flex-wrap gap-3">
-              <button onclick="exportData()" class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                <i class="ph ph-export text-lg"></i> Backup Data (JSON)
-              </button>
-              
-              <label class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors shadow-sm">
-                <i class="ph ph-download-simple text-lg"></i> Restore Data
-                <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
-              </label>
-
-              <button onclick="factoryReset()" class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors md:ml-auto w-full md:w-auto justify-center">
-                <i class="ph ph-trash text-lg"></i> Hapus Semua Data
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
+        <button type="submit" id="auth-submit-btn" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:opacity-90 transition-all dynamic-bg">Masuk Sekarang</button>
+      </form>
+      
+      <div class="mt-6 text-center">
+        <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm font-medium text-primary hover:underline outline-none dynamic-text">Belum punya akun? Daftar</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Mobile Bottom Nav -->
-    <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-16 pb-safe z-40">
-      <button onclick="switchTab('dashboard')" id="mob-dashboard" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active">
-        <i class="ph ph-squares-four text-2xl mb-1"></i><span class="text-[10px] font-medium">Home</span>
-      </button>
-      <button onclick="switchTab('transactions')" id="mob-transactions" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500">
-        <i class="ph ph-list-dashes text-2xl mb-1"></i><span class="text-[10px] font-medium">Histori</span>
-      </button>
+  <!-- MAIN APP CONTAINER -->
+  <div id="app-container" class="hidden w-full h-full flex-col md:flex-row">
+    
+    <!-- Sidebar (Desktop) -->
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10 relative shrink-0">
+      <div class="p-6 flex items-center gap-3 border-b border-gray-100">
+        <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
+        <h1 class="text-xl font-bold text-gray-800 tracking-tight" id="sidebar-app-name">FinPro</h1>
+      </div>
       
-      <div class="w-full flex justify-center relative">
-        <button onclick="openModal('add-transaction')" class="dynamic-bg absolute -top-6 bg-primary hover:opacity-90 transition-opacity text-white w-14 h-14 rounded-full flex justify-center items-center shadow-lg border-4 border-gray-50">
-          <i class="ph ph-plus text-2xl"></i>
+      <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+        <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors active">
+          <i class="ph ph-squares-four text-xl"></i><span>Dashboard</span>
+        </button>
+        <button onclick="switchTab('transactions')" id="nav-transactions" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
+          <i class="ph ph-list-dashes text-xl"></i><span>Transaksi</span>
+        </button>
+        <button onclick="switchTab('wallets')" id="nav-wallets" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
+          <i class="ph ph-wallet text-xl"></i><span>Dompet</span>
+        </button>
+        <button onclick="switchTab('goals')" id="nav-goals" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
+          <i class="ph ph-target text-xl"></i><span>Target</span>
+        </button>
+        <button onclick="switchTab('settings')" id="nav-settings" class="nav-item w-full flex items-center gap-3 px-4 py-3 text-gray-600 rounded-xl hover:bg-gray-50 transition-colors">
+          <i class="ph ph-gear text-xl"></i><span>Pengaturan</span>
+        </button>
+      </nav>
+      
+      <div class="p-4 border-t border-gray-200">
+        <div class="mb-4 text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">Halo, <span id="display-username-desktop">User</span></div>
+        <button onclick="openModal('add-transaction')" class="dynamic-bg w-full bg-primary hover:opacity-90 text-white py-3 rounded-xl shadow-md font-medium flex justify-center items-center gap-2 transition-all transform hover:-translate-y-0.5">
+          <i class="ph ph-plus-circle text-xl"></i>Catat Transaksi
         </button>
       </div>
+    </aside>
 
-      <button onclick="switchTab('wallets')" id="mob-wallets" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500">
-        <i class="ph ph-wallet text-2xl mb-1"></i><span class="text-[10px] font-medium">Dompet</span>
-      </button>
-      <button onclick="switchTab('goals')" id="mob-goals" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500">
-        <i class="ph ph-target text-2xl mb-1"></i><span class="text-[10px] font-medium">Target</span>
-      </button>
-    </nav>
-  </main>
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-gray-50/50 w-full">
+      
+      <!-- Topbar (Mobile only) -->
+      <header class="md:hidden bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10 shrink-0">
+        <div class="flex items-center gap-2">
+          <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
+          <h1 class="text-lg font-bold text-gray-800" id="mobile-app-name">FinPro</h1>
+        </div>
+        <button onclick="openModal('add-transaction')" class="dynamic-bg bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
+          <i class="ph ph-plus text-lg"></i>
+        </button>
+      </header>
+
+      <!-- Scrollable Content Area -->
+      <div class="flex-1 overflow-y-auto p-4 md:p-8 pb-24 md:pb-8" id="main-scroll">
+        
+        <!-- DASHBOARD VIEW -->
+        <section id="view-dashboard" class="space-y-6 block">
+          <div class="flex justify-between items-end">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800">Ringkasan Keuangan</h2>
+              <p class="text-gray-500 mt-1" id="current-month-text">Bulan ini</p>
+            </div>
+            <input type="month" id="filter-month" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white shadow-sm outline-none">
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+              <div class="absolute top-0 right-0 p-4 opacity-10"><i class="ph ph-wallet text-6xl text-gray-800"></i></div>
+              <p class="text-gray-500 text-sm font-medium">Total Saldo (Semua Dompet)</p>
+              <h3 class="text-2xl font-bold text-gray-800 mt-1" id="dash-balance">Rp 0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+               <div class="absolute top-0 right-0 p-4 opacity-10"><i class="ph ph-trend-up text-6xl text-success"></i></div>
+              <p class="text-gray-500 text-sm font-medium">Pemasukan Bulan Ini</p>
+              <h3 class="text-xl font-bold text-success mt-1" id="dash-income">Rp 0</h3>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden">
+               <div class="absolute top-0 right-0 p-4 opacity-10"><i class="ph ph-trend-down text-6xl text-danger"></i></div>
+              <p class="text-gray-500 text-sm font-medium">Pengeluaran Bulan Ini</p>
+              <h3 class="text-xl font-bold text-danger mt-1" id="dash-expense">Rp 0</h3>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Arus Kas (6 Bulan Terakhir)</h3>
+              <div class="relative h-64 w-full"><canvas id="cashflowChart"></canvas></div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Pengeluaran per Kategori</h3>
+              <div class="relative h-64 w-full flex justify-center items-center"><canvas id="categoryChart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+              <h3 class="text-lg font-bold text-gray-800">Transaksi Terakhir</h3>
+              <button onclick="switchTab('transactions')" class="dynamic-text text-primary text-sm font-medium hover:underline">Lihat Semua</button>
+            </div>
+            <div id="recent-transactions-list" class="divide-y divide-gray-100"></div>
+          </div>
+        </section>
+
+        <section id="view-transactions" class="space-y-6 hidden">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800">Riwayat Transaksi</h2>
+            <button onclick="openModal('add-transaction')" class="hidden md:flex dynamic-bg bg-primary hover:opacity-90 transition-opacity text-white px-4 py-2 rounded-lg text-sm font-medium items-center gap-2">
+              <i class="ph ph-plus"></i> Transaksi Baru
+            </button>
+          </div>
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="p-4 border-b border-gray-100 flex flex-wrap gap-3 bg-gray-50/50">
+              <select id="filter-type" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
+                <option value="all">Semua Tipe</option>
+                <option value="income">Pemasukan</option>
+                <option value="expense">Pengeluaran</option>
+                <option value="transfer">Transfer Antar Dompet</option>
+              </select>
+              <input type="month" id="filter-month-tx" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
+            </div>
+            <div id="all-transactions-list" class="divide-y divide-gray-100"></div>
+          </div>
+        </section>
+
+        <section id="view-wallets" class="space-y-6 hidden">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-bold text-gray-800">Kelola Dompet</h2>
+            <button onclick="openModal('add-wallet')" class="dynamic-bg bg-primary hover:opacity-90 transition-opacity text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
+              <i class="ph ph-plus"></i> Tambah Dompet
+            </button>
+          </div>
+          <div id="wallets-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </section>
+
+        <section id="view-goals" class="space-y-6 hidden">
+          <div class="flex justify-between items-center">
+            <div>
+              <h2 class="text-2xl font-bold text-gray-800">Target Finansial</h2>
+              <p class="text-gray-500 text-sm mt-1">Capai impianmu langkah demi langkah</p>
+            </div>
+            <button onclick="openModal('add-goal')" class="dynamic-bg bg-primary hover:opacity-90 transition-opacity text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
+              <i class="ph ph-plus"></i> Buat Target
+            </button>
+          </div>
+          <div id="goals-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <section id="view-settings" class="space-y-6 hidden max-w-3xl">
+          <div class="flex justify-between items-end">
+            <h2 class="text-2xl font-bold text-gray-800">Pengaturan</h2>
+            <button onclick="handleLogout()" class="text-danger hover:bg-red-50 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors border border-red-100">
+              <i class="ph ph-sign-out"></i> Keluar
+            </button>
+          </div>
+
+          <!-- MODUL WEB APP BUILDER -->
+          <div class="dynamic-gradient-bg bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl shadow-lg overflow-hidden mb-6 text-white relative">
+            <div class="absolute -top-10 -right-10 p-8 opacity-20 pointer-events-none transform rotate-12">
+              <i class="ph ph-android-logo text-[180px]"></i>
+            </div>
+            
+            <div class="p-8 relative z-10">
+              <div class="flex items-center gap-3 mb-2">
+                <div class="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm border border-white/20">
+                  <i class="ph ph-wrench text-2xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold">App Builder</h3>
+              </div>
+              <p class="text-sm text-white/90 mb-8 max-w-md leading-relaxed">
+                Ubah identitas aplikasi sesuka Anda. Setelah diterapkan, klik <b>Instal</b> untuk menjadikan ini Aplikasi Android penuh.
+              </p>
+              
+              <div class="space-y-5 max-w-md bg-black/10 p-6 rounded-2xl border border-white/10 backdrop-blur-md">
+                <div>
+                  <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-2">Nama Aplikasi</label>
+                  <input type="text" id="builder-name" value="FinPro" class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:ring-2 focus:ring-white outline-none transition-all font-medium text-lg">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-white/80 uppercase tracking-wider mb-2">Warna Tema (Branding)</label>
+                  <div class="flex items-center gap-4 bg-white/5 p-2 rounded-xl border border-white/10">
+                    <input type="color" id="builder-color" value="#4F46E5" class="w-12 h-12 border-2 border-white/30 rounded-lg cursor-pointer bg-transparent">
+                    <span class="text-sm font-medium text-white/90 flex-1">Menentukan warna dominan navbar & ikon.</span>
+                  </div>
+                </div>
+                
+                <div class="pt-4 flex flex-col gap-3">
+                  <button id="btn-apply-builder" class="w-full bg-white text-gray-900 py-3.5 rounded-xl font-bold shadow-lg shadow-black/10 hover:bg-gray-100 transition-all flex justify-center items-center gap-2 transform active:scale-95">
+                    <i class="ph ph-magic-wand text-xl"></i> Terapkan Perubahan
+                  </button>
+                  <button id="btn-trigger-install-modal" class="w-full bg-emerald-500 hover:bg-emerald-400 text-white border border-emerald-400/50 py-3.5 rounded-xl font-bold transition-all flex justify-center items-center gap-2 shadow-lg shadow-emerald-900/20 transform active:scale-95">
+                    <i class="ph ph-download-simple text-xl"></i> Instal sebagai Aplikasi Android
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Preferensi Biasa -->
+          <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-100">
+              <h3 class="text-lg font-bold text-gray-800 mb-4">Preferensi Umum</h3>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1">Mata Uang Default</label>
+                  <select id="setting-currency" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none bg-gray-50">
+                    <option value="IDR">Rupiah (Rp)</option>
+                    <option value="USD">US Dollar ($)</option>
+                    <option value="EUR">Euro (€)</option>
+                  </select>
+                </div>
+                <button onclick="saveSettings()" class="dynamic-bg bg-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-sm hover:opacity-90 transition-colors">
+                  Simpan Preferensi
+                </button>
+              </div>
+            </div>
+
+            <div class="p-6 bg-gray-50/50">
+              <h3 class="text-lg font-bold text-gray-800 mb-2">Manajemen Data Akun</h3>
+              <p class="text-sm text-gray-500 mb-5">Data ini disimpan khusus untuk pengguna: <b id="settings-username-display" class="text-gray-700"></b>.</p>
+              
+              <div class="flex flex-wrap gap-3">
+                <button onclick="exportData()" class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
+                  <i class="ph ph-export text-lg"></i> Backup Data
+                </button>
+                
+                <label class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors shadow-sm">
+                  <i class="ph ph-download-simple text-lg"></i> Restore Data
+                  <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
+                </label>
+
+                <button onclick="factoryReset()" class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors md:ml-auto w-full md:w-auto justify-center">
+                  <i class="ph ph-trash text-lg"></i> Hapus Data Akun Ini
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Mobile Bottom Nav -->
+      <nav class="md:hidden fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around items-center h-16 pb-safe z-40 shrink-0">
+        <button onclick="switchTab('dashboard')" id="mob-dashboard" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500 active">
+          <i class="ph ph-squares-four text-2xl mb-1"></i><span class="text-[10px] font-medium">Home</span>
+        </button>
+        <button onclick="switchTab('transactions')" id="mob-transactions" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500">
+          <i class="ph ph-list-dashes text-2xl mb-1"></i><span class="text-[10px] font-medium">Histori</span>
+        </button>
+        
+        <div class="w-full flex justify-center relative">
+          <button onclick="openModal('add-transaction')" class="dynamic-bg absolute -top-6 bg-primary hover:opacity-90 transition-opacity text-white w-14 h-14 rounded-full flex justify-center items-center shadow-lg border-4 border-gray-50">
+            <i class="ph ph-plus text-2xl"></i>
+          </button>
+        </div>
+
+        <button onclick="switchTab('wallets')" id="mob-wallets" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500">
+          <i class="ph ph-wallet text-2xl mb-1"></i><span class="text-[10px] font-medium">Dompet</span>
+        </button>
+        <button onclick="switchTab('goals')" id="mob-goals" class="nav-item flex flex-col items-center justify-center w-full h-full text-gray-500">
+          <i class="ph ph-target text-2xl mb-1"></i><span class="text-[10px] font-medium">Target</span>
+        </button>
+      </nav>
+    </main>
+  </div> <!-- End of App Container -->
 
   <!-- MODALS OVERLAY -->
   <div id="modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 modal-enter flex items-center justify-center p-4 hidden">
@@ -348,32 +387,32 @@
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Uang</label>
             <div class="relative">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg" id="tx-currency-symbol">Rp</span>
-              <input type="number" id="tx-amount" required min="1" step="any" class="w-full pl-12 pr-4 py-3.5 text-2xl font-black border border-gray-200 rounded-2xl focus:ring-4 focus:ring-primary/10 outline-none text-gray-800 transition-shadow" placeholder="0">
+              <input type="number" id="tx-amount" required min="1" step="any" class="w-full pl-12 pr-4 py-3.5 text-2xl font-black border border-gray-200 rounded-2xl focus:ring-4 focus:ring-primary/10 outline-none text-gray-800 transition-shadow dynamic-focus" placeholder="0">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tanggal</label>
-              <input type="date" id="tx-date" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium">
+              <input type="date" id="tx-date" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none text-gray-700 font-medium">
             </div>
             <div id="wrap-category">
               <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
-              <select id="tx-category" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium bg-white"></select>
+              <select id="tx-category" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none text-gray-700 font-medium bg-white"></select>
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4" id="wrap-wallets">
             <div id="wrap-wallet-from" class="col-span-2">
               <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2" id="lbl-wallet-from">Gunakan Dompet</label>
-              <select id="tx-wallet" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium bg-white"></select>
+              <select id="tx-wallet" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none text-gray-700 font-medium bg-white"></select>
             </div>
             <div id="wrap-wallet-to" class="hidden">
               <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tujuan Dompet</label>
-              <select id="tx-wallet-to" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none text-gray-700 font-medium bg-white"></select>
+              <select id="tx-wallet-to" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none text-gray-700 font-medium bg-white"></select>
             </div>
           </div>
           <div>
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Catatan Singkat</label>
-            <input type="text" id="tx-note" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium text-gray-700" placeholder="Opsional...">
+            <input type="text" id="tx-note" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium text-gray-700" placeholder="Opsional...">
           </div>
           <div class="pt-2">
             <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 text-white py-4 rounded-2xl font-bold text-lg shadow-lg shadow-primary/30 transition-all active:scale-[0.98]">Simpan Transaksi</button>
@@ -390,8 +429,8 @@
       </div>
       <div class="p-6">
         <form id="form-wallet" class="space-y-5">
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Dompet</label><input type="text" id="wallet-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium" placeholder="BCA / Tunai / Dana"></div>
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Saldo Saat Ini</label><input type="number" id="wallet-balance" required step="any" value="0" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Dompet</label><input type="text" id="wallet-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium" placeholder="BCA / Tunai / Dana"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Saldo Saat Ini</label><input type="number" id="wallet-balance" required step="any" value="0" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium"></div>
           <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Warna Identifikasi</label><input type="color" id="wallet-color" value="#3B82F6" class="w-full h-14 border-2 border-gray-200 rounded-xl p-1 cursor-pointer bg-white"></div>
           <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 transition-opacity text-white py-3.5 rounded-xl font-bold mt-2 shadow-md">Simpan Dompet</button>
         </form>
@@ -406,10 +445,10 @@
       </div>
       <div class="p-6">
         <form id="form-goal" class="space-y-4">
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Untuk Apa?</label><input type="text" id="goal-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium" placeholder="Beli Laptop / DP Rumah"></div>
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Butuh Berapa?</label><input type="number" id="goal-target" required min="1" step="any" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium"></div>
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sudah Ada (Awal)</label><input type="number" id="goal-saved" min="0" step="any" value="0" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium"></div>
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Target Selesai</label><input type="month" id="goal-deadline" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none text-gray-700 font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Untuk Apa?</label><input type="text" id="goal-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium" placeholder="Beli Laptop / DP Rumah"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Butuh Berapa?</label><input type="number" id="goal-target" required min="1" step="any" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Sudah Ada (Awal)</label><input type="number" id="goal-saved" min="0" step="any" value="0" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Target Selesai</label><input type="month" id="goal-deadline" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none text-gray-700 font-medium"></div>
           <button type="submit" class="dynamic-bg w-full bg-primary hover:opacity-90 transition-opacity text-white py-3.5 rounded-xl font-bold mt-2 shadow-md">Simpan Target</button>
         </form>
       </div>
@@ -423,7 +462,7 @@
       <div class="p-6">
         <form id="form-update-goal" class="space-y-4">
           <input type="hidden" id="update-goal-id">
-          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Disetor</label><input type="number" id="update-goal-amount" required min="1" step="any" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 outline-none font-medium" placeholder="0"></div>
+          <div><label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Disetor</label><input type="number" id="update-goal-amount" required min="1" step="any" class="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none font-medium" placeholder="0"></div>
           <button type="submit" class="w-full bg-success hover:bg-emerald-600 transition-colors text-white py-3.5 rounded-xl font-bold mt-4 shadow-lg shadow-emerald-200">Tambahkan Progres</button>
         </form>
       </div>
@@ -438,24 +477,19 @@
       <p id="confirm-msg" class="text-gray-500 mb-8 text-sm">Apakah Anda yakin?</p>
       <div class="flex gap-3 w-full">
         <button id="confirm-btn-no" class="flex-1 py-3 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-colors">Batal</button>
-        <button id="confirm-btn-yes" class="flex-1 py-3 rounded-xl bg-danger text-white font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-200">Ya, Hapus</button>
+        <button id="confirm-btn-yes" class="flex-1 py-3 rounded-xl bg-danger text-white font-bold hover:bg-red-600 transition-colors shadow-lg shadow-red-200">Ya, Lanjutkan</button>
       </div>
     </div>
   </div>
 
   <!-- MODAL: POP UP INSTALL PWA KHUSUS -->
   <div id="modal-pwa-install" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden flex items-end md:items-center justify-center pb-0 md:p-4 transition-opacity duration-300 opacity-0">
-    <!-- Panel Install (Bottom sheet di mobile, Center modal di Desktop) -->
     <div id="pwa-panel" class="bg-white w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden transform translate-y-full md:translate-y-10 transition-transform duration-500 ease-out flex flex-col relative">
-      
-      <!-- Dekorasi Header -->
       <div class="dynamic-bg absolute top-0 left-0 right-0 h-32 bg-primary z-0 rounded-t-3xl opacity-10"></div>
       
       <div class="p-6 relative z-10 flex flex-col items-center text-center mt-4">
-        <!-- Ikon App Besar -->
         <div class="w-24 h-24 bg-white p-2 rounded-3xl shadow-xl border border-gray-100 mb-4 transform -translate-y-12 relative">
-          <img src="https://placehold.co/200x200/4F46E5/FFFFFF?text=App" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
-          <!-- Badge Centang -->
+          <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
           <div class="absolute -bottom-2 -right-2 bg-success text-white w-8 h-8 rounded-full flex justify-center items-center border-4 border-white shadow-sm">
             <i class="ph ph-check-circle text-lg"></i>
           </div>
@@ -468,7 +502,6 @@
           Bukan sekadar pintasan! Instal sebagai <b>Aplikasi Android Sesungguhnya (WebAPK)</b>. Akses lebih cepat, mendukung mode offline, dan layar penuh tanpa address bar browser.
         </p>
 
-        <!-- Fitur Highlight -->
         <div class="w-full bg-gray-50 rounded-2xl p-4 flex flex-col gap-3 mb-6 border border-gray-100 text-left">
           <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex justify-center items-center"><i class="ph ph-lightning"></i></div>
@@ -484,7 +517,6 @@
           </div>
         </div>
 
-        <!-- Tombol Aksi -->
         <div class="w-full flex flex-col gap-3">
           <button id="pwa-btn-confirm-install" class="dynamic-bg w-full py-4 bg-primary text-white font-bold rounded-2xl text-lg shadow-lg shadow-primary/30 flex justify-center items-center gap-2 hover:scale-[1.02] transition-transform">
             <i class="ph ph-download-simple text-xl"></i> Instal Aplikasi Sekarang
@@ -501,25 +533,167 @@
   <div id="toast-container" class="fixed top-4 right-4 z-[110] flex flex-col gap-3 pointer-events-none"></div>
 
   <script>
+    /* ================= INITIALIZATION & AUTHENTICATION LOGIC ================= */
+    const USERS_DB_KEY = 'finpro_users_registry';
+    let currentUser = null;
+
+    const defaultCategories = [
+      { id: 'c1', name: 'Makanan & Minuman', type: 'expense', icon: 'hamburger', color: '#F59E0B' },
+      { id: 'c2', name: 'Transportasi', type: 'expense', icon: 'car', color: '#3B82F6' },
+      { id: 'c3', name: 'Belanja', type: 'expense', icon: 'shopping-bag', color: '#EC4899' },
+      { id: 'c4', name: 'Tagihan & Utilitas', type: 'expense', icon: 'receipt', color: '#8B5CF6' },
+      { id: 'c5', name: 'Kesehatan', type: 'expense', icon: 'heartbeat', color: '#EF4444' },
+      { id: 'c6', name: 'Hiburan', type: 'expense', icon: 'film-strip', color: '#14B8A6' },
+      { id: 'c7', name: 'Gaji', type: 'income', icon: 'money', color: '#10B981' },
+      { id: 'c8', name: 'Investasi', type: 'income', icon: 'chart-line-up', color: '#0EA5E9' },
+      { id: 'c9', name: 'Pemasukan Lain', type: 'income', icon: 'plus-circle', color: '#6B7280' },
+      { id: 'c10', name: 'Pengeluaran Lain', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
+    ];
+
+    const defaultState = {
+      settings: { currency: 'IDR', appName: 'FinPro', themeColor: '#4F46E5' },
+      wallets: [
+        { id: 'w1', name: 'Dompet Tunai', balance: 0, color: '#10B981' },
+        { id: 'w2', name: 'Rekening Utama', balance: 0, color: '#3B82F6' }
+      ],
+      categories: defaultCategories,
+      transactions: [],
+      goals: []
+    };
+
+    let state = null; // Data kosong sampai user berhasil login
+    let charts = { cashflow: null, category: null };
+
+    // Mengecek apakah user sebelumnya masih login
+    function checkSession() {
+      const savedUser = sessionStorage.getItem('finpro_active_user');
+      if (savedUser) {
+        processLoginSuccess(savedUser);
+      }
+      // Jika tidak, biarkan default layar Auth muncul
+    }
+
+    function toggleAuthMode() {
+      const isReg = document.getElementById('auth-is-reg');
+      const title = document.getElementById('auth-title');
+      const btn = document.getElementById('auth-submit-btn');
+      const toggleBtn = document.getElementById('auth-toggle-btn');
+      
+      if (isReg.value === 'false') {
+        isReg.value = 'true';
+        title.innerText = 'Daftar FinPro';
+        btn.innerText = 'Buat Akun Baru';
+        toggleBtn.innerText = 'Sudah punya akun? Masuk';
+      } else {
+        isReg.value = 'false';
+        title.innerText = 'Masuk FinPro';
+        btn.innerText = 'Masuk Sekarang';
+        toggleBtn.innerText = 'Belum punya akun? Daftar';
+      }
+    }
+
+    document.getElementById('form-auth').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.getElementById('auth-user').value.trim();
+      const pass = document.getElementById('auth-pass').value;
+      const isReg = document.getElementById('auth-is-reg').value === 'true';
+
+      if (!username || !pass) return showToast('Harap isi semua kolom!', 'warning');
+
+      let usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '{}');
+
+      if (isReg) {
+        if (usersDb[username]) return showToast('Username sudah dipakai orang lain!', 'danger');
+        usersDb[username] = pass; // Di dunia nyata password harus di-hash (enkripsi)
+        localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));
+        showToast('Pendaftaran berhasil! Silakan login.', 'success');
+        toggleAuthMode();
+        document.getElementById('auth-pass').value = '';
+      } else {
+        if (!usersDb[username] || usersDb[username] !== pass) {
+          return showToast('Username atau password salah!', 'danger');
+        }
+        showToast(`Selamat datang kembali, ${username}!`, 'success');
+        processLoginSuccess(username);
+      }
+    });
+
+    function processLoginSuccess(username) {
+      currentUser = username;
+      sessionStorage.setItem('finpro_active_user', username);
+      
+      // Update UI untuk menunjukkan aplikasi utama
+      document.getElementById('auth-container').classList.add('hidden');
+      document.getElementById('app-container').classList.remove('hidden');
+      document.getElementById('app-container').classList.add('flex');
+      
+      document.getElementById('display-username-desktop').innerText = username;
+      document.getElementById('settings-username-display').innerText = username;
+
+      loadData();
+      renderApp();
+      
+      // Delay render chart untuk memastikan layout DOM selesai dilukis
+      setTimeout(initCharts, 200);
+    }
+
+    function handleLogout() {
+      showConfirm("Yakin ingin keluar dari akun ini?", () => {
+        sessionStorage.removeItem('finpro_active_user');
+        currentUser = null;
+        state = null; // Hapus state dari memori
+        
+        // Reset UI Auth Form
+        document.getElementById('auth-user').value = '';
+        document.getElementById('auth-pass').value = '';
+        
+        document.getElementById('app-container').classList.add('hidden');
+        document.getElementById('app-container').classList.remove('flex');
+        document.getElementById('auth-container').classList.remove('hidden');
+        showToast("Berhasil keluar.", "success");
+      });
+    }
+
+    /* ================= DATA MANAGEMENT ================= */
+    function loadData() {
+      if(!currentUser) return;
+      try {
+        const data = localStorage.getItem(`finpro_data_${currentUser}`);
+        if (data) {
+          let parsed = JSON.parse(data);
+          parsed.wallets = parsed.wallets || defaultState.wallets;
+          parsed.categories = parsed.categories || defaultState.categories;
+          parsed.transactions = parsed.transactions || [];
+          parsed.goals = parsed.goals || [];
+          parsed.settings = parsed.settings || defaultState.settings;
+          state = parsed;
+          return;
+        }
+      } catch (e) { console.error("Gagal load data", e); }
+      // Jika error atau data tidak ada, gunakan default state
+      state = structuredClone(defaultState);
+    }
+
+    function saveData() {
+      if(!currentUser || !state) return;
+      localStorage.setItem(`finpro_data_${currentUser}`, JSON.stringify(state));
+      renderApp();
+    }
+
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
+
     /* ================= PWA & WEB APP BUILDER LOGIC ================= */
     let currentManifestUrl = null;
     let deferredPrompt = null;
     
-    // Fungsi mengembalikan URL ikon custom berdasarkan warna tema
     function getGeneratedIconUrl(text, bgColorHex) {
-      const hex = bgColorHex.replace('#', '');
-      const shortText = text.substring(0, 2).toUpperCase();
-      return `https://placehold.co/200x200/${hex}/FFFFFF?text=${shortText}`;
+      return "https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg";
     }
 
-    // Fungsi Web App Builder untuk membangun PWA dinamis
     function buildPWA(appName, themeColor) {
       const iconUrl = getGeneratedIconUrl(appName, themeColor);
       
-      // Update semua icon di UI
-      document.querySelectorAll('.app-logo-img').forEach(img => {
-        img.src = iconUrl;
-      });
+      document.querySelectorAll('.app-logo-img').forEach(img => { img.src = iconUrl; });
 
       const manifestContent = {
         "name": appName,
@@ -532,8 +706,8 @@
         "description": "Aplikasi Manajemen Keuangan Cerdas",
         "prefer_related_applications": false,
         "icons": [
-          { "src": iconUrl, "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-          { "src": iconUrl, "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+          { "src": iconUrl, "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
+          { "src": iconUrl, "sizes": "512x512", "type": "image/jpeg", "purpose": "any maskable" }
         ]
       };
       
@@ -543,7 +717,6 @@
       if(currentManifestUrl) URL.revokeObjectURL(currentManifestUrl);
       currentManifestUrl = URL.createObjectURL(blobManifest);
 
-      // Ganti / Pasang manifest baru
       let oldLink = document.querySelector('link[rel="manifest"]');
       if(oldLink) oldLink.remove();
       const manifestLink = document.createElement('link');
@@ -551,18 +724,16 @@
       manifestLink.href = currentManifestUrl;
       document.head.appendChild(manifestLink);
       
-      // Update Meta Theme Color
       document.getElementById('meta-theme-color').setAttribute('content', themeColor);
       
-      // Update UI Teks
       document.getElementById('sidebar-app-name').innerText = appName;
       document.getElementById('mobile-app-name').innerText = appName;
       document.getElementById('install-popup-app-name').innerText = appName;
       document.title = `${appName} - Financial App`;
 
-      // Aplikasikan warna dinamis (Builder)
       document.documentElement.style.setProperty('--theme-color', themeColor);
       document.querySelectorAll('.dynamic-bg').forEach(el => { el.style.backgroundColor = themeColor; });
+      document.querySelectorAll('.dynamic-bg-light').forEach(el => { el.style.backgroundColor = `${themeColor}15`; }); // 15 = hex alpha
       document.querySelectorAll('.dynamic-text').forEach(el => { el.style.color = themeColor; });
       document.querySelectorAll('.dynamic-border').forEach(el => { el.style.borderColor = themeColor; });
       document.querySelectorAll('.dynamic-gradient-bg').forEach(el => {
@@ -570,18 +741,19 @@
       });
     }
 
-    // Eksekusi Builder Form
     document.getElementById('btn-apply-builder').addEventListener('click', () => {
        const appName = document.getElementById('builder-name').value || "FinPro";
        const themeColor = document.getElementById('builder-color').value || "#4F46E5";
        
        buildPWA(appName, themeColor);
-       saveSettings(); 
-       
+       if(state) {
+          state.settings.appName = appName;
+          state.settings.themeColor = themeColor;
+          saveData(); 
+       }
        showToast("Identitas Web App berhasil diterapkan! Siap diinstal.", "success");
     });
 
-    // Registrasi Service Worker untuk syarat mutlak PWA Android
     if ('serviceWorker' in navigator) {
       const swCode = `
         const CACHE_NAME = 'finpro-webapk-v4';
@@ -589,28 +761,20 @@
         self.addEventListener('activate', (e) => self.clients.claim());
         self.addEventListener('fetch', (e) => {
           e.respondWith(
-            fetch(e.request).catch(() => new Response('Aplikasi berjalan dalam mode Offline.', { status: 200, headers: {'Content-Type':'text/plain'} }))
+            fetch(e.request).catch(() => new Response('Aplikasi sedang berjalan dalam mode Offline.', { status: 200, headers: {'Content-Type':'text/plain'} }))
           );
         });
       `;
       const blobSW = new Blob([swCode], {type: 'application/javascript'});
       const swUrl = URL.createObjectURL(blobSW);
-      navigator.serviceWorker.register(swUrl).then(reg => {
-        console.log('Service Worker Registered');
-      }).catch(err => console.log('SW Reg Failed', err));
+      navigator.serviceWorker.register(swUrl).then(reg => { console.log('SW Ready'); }).catch(err => console.log('SW Failed', err));
     }
 
     const installModal = document.getElementById('modal-pwa-install');
     const installPanel = document.getElementById('pwa-panel');
-    const btnTriggerModal = document.getElementById('btn-trigger-install-modal');
-    const btnConfirmInstall = document.getElementById('pwa-btn-confirm-install');
-    const btnCancelInstall = document.getElementById('pwa-btn-cancel');
 
-    // Menangkap event instalasi native
     window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      console.log('beforeinstallprompt tertangkap.');
+      e.preventDefault(); deferredPrompt = e;
     });
 
     function openInstallModal() {
@@ -626,84 +790,26 @@
       installPanel.classList.remove('translate-y-0');
       installPanel.classList.add('translate-y-full', 'md:translate-y-10');
       installModal.classList.add('opacity-0');
-      setTimeout(() => {
-        installModal.classList.add('hidden');
-      }, 300);
+      setTimeout(() => { installModal.classList.add('hidden'); }, 300);
     }
 
-    btnTriggerModal.addEventListener('click', openInstallModal);
-
-    btnConfirmInstall.addEventListener('click', async () => {
+    document.getElementById('btn-trigger-install-modal').addEventListener('click', openInstallModal);
+    document.getElementById('pwa-btn-confirm-install').addEventListener('click', async () => {
       if (deferredPrompt) {
-        closeInstallModal();
-        deferredPrompt.prompt();
+        closeInstallModal(); deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if(outcome === 'accepted') {
-          showToast("Proses Instalasi Dimulai...", "success");
-        }
+        if(outcome === 'accepted') { showToast("Proses Instalasi WebAPK Dimulai...", "success"); }
         deferredPrompt = null;
       } else {
-        closeInstallModal();
-        showToast("Browser tidak memicu instalasi otomatis (mungkin sudah terinstal). Cek menu browser Anda > 'Tambahkan ke Layar Utama'.", "warning");
+        closeInstallModal(); showToast("Perangkat tidak merespon/sudah diinstal. Cek layar utama Anda.", "warning");
       }
     });
 
-    btnCancelInstall.addEventListener('click', closeInstallModal);
+    document.getElementById('pwa-btn-cancel').addEventListener('click', closeInstallModal);
     installModal.addEventListener('click', (e) => { if(e.target === installModal) closeInstallModal(); });
     window.addEventListener('appinstalled', () => { closeInstallModal(); showToast("🎉 Aplikasi berhasil diinstal!", "success"); deferredPrompt = null; });
 
-    const STORAGE_KEY = 'finpro_data_v3';
-    
-    const defaultCategories = [
-      { id: 'c1', name: 'Makanan & Minuman', type: 'expense', icon: 'hamburger', color: '#F59E0B' },
-      { id: 'c2', name: 'Transportasi', type: 'expense', icon: 'car', color: '#3B82F6' },
-      { id: 'c3', name: 'Belanja', type: 'expense', icon: 'shopping-bag', color: '#EC4899' },
-      { id: 'c4', name: 'Tagihan & Utilitas', type: 'expense', icon: 'receipt', color: '#8B5CF6' },
-      { id: 'c5', name: 'Kesehatan', type: 'expense', icon: 'heartbeat', color: '#EF4444' },
-      { id: 'c6', name: 'Hiburan', type: 'expense', icon: 'film-strip', color: '#14B8A6' },
-      { id: 'c7', name: 'Gaji', type: 'income', icon: 'money', color: '#10B981' },
-      { id: 'c8', name: 'Investasi', type: 'income', icon: 'chart-line-up', color: '#0EA5E9' },
-      { id: 'c9', name: 'Lainnya', type: 'income', icon: 'plus-circle', color: '#6B7280' },
-      { id: 'c10', name: 'Lainnya', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
-    ];
-
-    const defaultState = {
-      settings: { currency: 'IDR', appName: 'FinPro', themeColor: '#4F46E5' },
-      wallets: [
-        { id: 'w1', name: 'Dompet Tunai', balance: 0, color: '#10B981' },
-        { id: 'w2', name: 'Rekening Utama', balance: 0, color: '#3B82F6' }
-      ],
-      categories: defaultCategories,
-      transactions: [],
-      goals: []
-    };
-
-    let state = loadData();
-    let charts = { cashflow: null, category: null };
-
-    function loadData() {
-      try {
-        const data = localStorage.getItem(STORAGE_KEY);
-        if (data) {
-          let parsed = JSON.parse(data);
-          parsed.wallets = parsed.wallets || defaultState.wallets;
-          parsed.categories = parsed.categories || defaultState.categories;
-          parsed.transactions = parsed.transactions || [];
-          parsed.goals = parsed.goals || [];
-          parsed.settings = parsed.settings || defaultState.settings;
-          return parsed;
-        }
-      } catch (e) { console.error("Gagal load data", e); }
-      return structuredClone(defaultState);
-    }
-
-    function saveData() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      renderApp();
-    }
-
-    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
-
+    /* ================= HELPER & UI LOGIC ================= */
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -728,10 +834,8 @@
       setTimeout(() => box.classList.replace('scale-95', 'scale-100'), 10);
       confirmCallback = callback;
     }
-
     document.getElementById('confirm-btn-no').onclick = closeConfirm;
     document.getElementById('confirm-btn-yes').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
-
     function closeConfirm() {
       const overlay = document.getElementById('confirm-overlay');
       const box = document.getElementById('confirm-box');
@@ -741,7 +845,7 @@
     }
 
     function formatMoney(amount) {
-      const code = state.settings.currency || 'IDR';
+      const code = state ? (state.settings.currency || 'IDR') : 'IDR';
       const locales = code === 'IDR' ? 'id-ID' : 'en-US';
       const fraction = code === 'IDR' ? 0 : 2;
       return new Intl.NumberFormat(locales, { style: 'currency', currency: code, minimumFractionDigits: fraction, maximumFractionDigits: fraction }).format(amount);
@@ -757,12 +861,10 @@
       const target = document.getElementById(`view-${tabId}`);
       if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
 
-      // Desktop Nav update
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-gray-50'));
       const desktopNav = document.getElementById(`nav-${tabId}`);
       if(desktopNav) desktopNav.classList.add('active');
 
-      // Mobile Nav update
       const mobNav = document.getElementById(`mob-${tabId}`);
       if(mobNav) {
         document.querySelectorAll('nav.md\\:hidden .nav-item').forEach(el => { 
@@ -772,7 +874,7 @@
         });
         mobNav.classList.remove('text-gray-500'); 
         mobNav.classList.add('active');
-        const themeColor = state.settings.themeColor || '#4F46E5';
+        const themeColor = state ? (state.settings.themeColor || '#4F46E5') : '#4F46E5';
         mobNav.style.color = themeColor;
       }
       if(tabId === 'dashboard') initCharts();
@@ -784,7 +886,6 @@
       
       modalOverlay.classList.remove('hidden');
       targetModal.classList.remove('hidden');
-      
       setTimeout(() => {
          modalOverlay.classList.add('modal-enter-active');
          targetModal.classList.add('modal-enter-active');
@@ -800,18 +901,13 @@
     function closeModals() {
       const modalOverlay = document.getElementById('modal-overlay');
       modalOverlay.classList.remove('modal-enter-active');
-      
-      document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { 
-          el.classList.remove('modal-enter-active'); 
-      });
-      
+      document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { el.classList.remove('modal-enter-active'); });
       setTimeout(() => {
           modalOverlay.classList.add('hidden');
-          document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { 
-             el.classList.add('hidden');
-          });
+          document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { el.classList.add('hidden'); });
       }, 300);
     }
+    document.getElementById('modal-overlay').addEventListener('click', (e) => { if(e.target.id === 'modal-overlay') closeModals(); });
 
     function setTxType(type) {
       document.getElementById('tx-type').value = type;
@@ -873,7 +969,7 @@
     });
 
     function deleteTransaction(id) {
-      showConfirm("Hapus transaksi ini? Saldo dompet akan disesuaikan.", () => {
+      showConfirm("Hapus transaksi ini? Saldo dompet akan disesuaikan kembali secara otomatis.", () => {
         const txIndex = state.transactions.findIndex(t => t.id === id); if(txIndex === -1) return;
         const tx = state.transactions[txIndex];
         if(tx.type === 'expense') { let w = state.wallets.find(w => w.id === tx.walletId); if(w) w.balance += tx.amount; }
@@ -907,7 +1003,8 @@
     });
 
     function renderApp() {
-      // Inisiasi Builder UI
+      if(!state) return; // Mencegah crash jika state tidak ada
+      
       document.getElementById('builder-name').value = state.settings.appName;
       document.getElementById('builder-color').value = state.settings.themeColor;
       buildPWA(state.settings.appName, state.settings.themeColor);
@@ -993,8 +1090,10 @@
     }
 
     function initCharts() {
+      if(!state) return; // Tolak jika tidak ada state
+      
       const cashflowCtx = document.getElementById('cashflowChart');
-      if(cashflowCtx) {
+      if(cashflowCtx && cashflowCtx.offsetParent !== null) { // Pastikan elemen canvas tidak display:none
          if(charts.cashflow) charts.cashflow.destroy();
          const labels = [], incomes = [], expenses = [];
          const d = new Date();
@@ -1014,7 +1113,7 @@
       }
 
       const categoryCtx = document.getElementById('categoryChart');
-      if(categoryCtx) {
+      if(categoryCtx && categoryCtx.offsetParent !== null) {
          if(charts.category) charts.category.destroy();
          const dashMonth = document.getElementById('filter-month').value || getCurrentMonthStr();
          const monthExpenseTx = state.transactions.filter(t => t.date.startsWith(dashMonth) && t.type === 'expense');
@@ -1040,26 +1139,36 @@
     }
     
     function exportData() {
+      if(!state) return;
       const dataStr = JSON.stringify(state, null, 2); const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_${state.settings.appName}_${new Date().toISOString().split('T')[0]}.json`); linkElement.click(); showToast("Backup data berhasil diunduh.", "success");
+      const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_${state.settings.appName}_${currentUser}_${new Date().toISOString().split('T')[0]}.json`); linkElement.click(); showToast("Backup data akun berhasil diunduh.", "success");
     }
     
     function importData(event) {
       const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
       reader.onload = function(e) {
-        try { const imported = JSON.parse(e.target.result); showConfirm("Aksi ini akan menimpa seluruh data Anda saat ini. Lanjutkan?", () => { state = { ...defaultState, ...imported }; saveData(); showToast("Data berhasil dipulihkan!", "success"); renderApp(); }); } 
+        try { const imported = JSON.parse(e.target.result); showConfirm("Aksi ini akan menimpa seluruh data akun Anda saat ini. Lanjutkan?", () => { state = { ...defaultState, ...imported }; saveData(); showToast("Data berhasil dipulihkan!", "success"); renderApp(); }); } 
         catch (err) { showToast("File backup tidak valid / rusak.", "warning"); } event.target.value = '';
       }; reader.readAsText(file);
     }
     
-    function factoryReset() { showConfirm("PERINGATAN: Semua data akan dihapus permanen. Lanjutkan?", () => { localStorage.removeItem(STORAGE_KEY); state = structuredClone(defaultState); saveData(); showToast("Sistem berhasil di-reset ke kondisi awal."); }); }
+    function factoryReset() { 
+      showConfirm("PERINGATAN: Semua data untuk akun ini akan dihapus permanen. Lanjutkan?", () => { 
+        localStorage.removeItem(`finpro_data_${currentUser}`); 
+        state = structuredClone(defaultState); 
+        saveData(); 
+        showToast("Data akun berhasil di-reset ke kondisi awal."); 
+      }); 
+    }
 
     document.getElementById('filter-month').addEventListener('change', renderApp);
     document.getElementById('filter-month-tx').addEventListener('change', renderApp);
     document.getElementById('filter-type').addEventListener('change', renderApp);
-    document.getElementById('modal-overlay').addEventListener('click', (e) => { if(e.target.id === 'modal-overlay') closeModals(); });
 
-    window.onload = () => { renderApp(); setTimeout(initCharts, 200); };
+    // Initial load process
+    window.onload = () => { 
+      checkSession(); // Cek jika pernah login
+    };
   </script>
 </body>
 </html>

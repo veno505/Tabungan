@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#4F46E5" id="meta-theme-color">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>FinPro - Sistem Keuangan Profesional</title>
+  <title>FinPro - Sistem Keuangan Cloud</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,15 +16,10 @@
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
           colors: {
-            primary: '#4F46E5', // Indigo 600
-            'primary-hover': '#4338CA', // Indigo 700
-            success: '#10B981', // Emerald 500
-            danger: '#EF4444', // Red 500
-            warning: '#F59E0B', // Amber 500
+            primary: '#4F46E5', 'primary-hover': '#4338CA',
+            success: '#10B981', danger: '#EF4444', warning: '#F59E0B',
           }
         }
       }
@@ -34,38 +29,28 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-    body {
-      background-color: #F3F4F6;
-      color: #1F2937;
-      -webkit-tap-highlight-color: transparent;
-    }
+    body { background-color: #F3F4F6; color: #1F2937; -webkit-tap-highlight-color: transparent; }
 
-    /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #F3F4F6; }
     ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 10px; }
     ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
 
-    /* Modal Animation */
     .modal-enter { opacity: 0; transform: scale(0.95); transition: all 0.3s ease-out; pointer-events: none;}
     .modal-enter-active { opacity: 1; transform: scale(1); pointer-events: auto; }
     
-    /* Install Popup Animation */
     @keyframes bounceIn {
       0% { transform: scale(0.8); opacity: 0; }
       60% { transform: scale(1.05); opacity: 1; }
       100% { transform: scale(1); opacity: 1; }
     }
-    .popup-bounce { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-
+    
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-    /* Active Nav Item */
     .nav-item.active { background-color: #EEF2FF; color: var(--theme-color, #4F46E5); font-weight: 600; }
     .nav-item.active i { color: var(--theme-color, #4F46E5); }
     
-    /* Toast Animations */
     @keyframes slideInUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
     .toast-enter { animation: slideInUp 0.3s ease-out forwards; }
@@ -79,27 +64,32 @@
     <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-sm border border-gray-100 mx-4">
       <div class="text-center mb-8">
         <div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mx-auto mb-4 dynamic-bg-light dynamic-text">
-          <i class="ph ph-shield-check text-3xl"></i>
+          <i class="ph ph-cloud-check text-3xl"></i>
         </div>
         <h2 class="text-2xl font-bold text-gray-800" id="auth-title">Masuk FinPro</h2>
-        <p class="text-sm text-gray-500 mt-2" id="auth-subtitle">Kelola keuangan sesuai gaya Anda.</p>
+        <p class="text-sm text-gray-500 mt-2" id="auth-subtitle">Kelola keuangan Anda dari mana saja.</p>
       </div>
       
       <form id="form-auth" class="space-y-5">
         <input type="hidden" id="auth-is-reg" value="false">
         <div>
-          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username</label>
-          <input type="text" id="auth-user" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium bg-gray-50 focus:bg-white transition-colors dynamic-focus" placeholder="Masukkan username">
+          <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Username Unik</label>
+          <input type="text" id="auth-user" required autocomplete="off" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium bg-gray-50 focus:bg-white transition-colors" placeholder="misal: budi123">
         </div>
         <div>
           <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Password</label>
-          <input type="password" id="auth-pass" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium bg-gray-50 focus:bg-white transition-colors dynamic-focus" placeholder="••••••••">
+          <input type="password" id="auth-pass" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 outline-none font-medium bg-gray-50 focus:bg-white transition-colors" placeholder="••••••••">
         </div>
-        <button type="submit" id="auth-submit-btn" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:opacity-90 transition-all dynamic-bg">Masuk Sekarang</button>
+        <button type="submit" id="auth-submit-btn" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold shadow-lg shadow-primary/30 hover:opacity-90 transition-all dynamic-bg">Masuk ke Akun</button>
       </form>
       
-      <div class="mt-6 text-center">
+      <div class="mt-6 text-center space-y-4">
         <button type="button" onclick="toggleAuthMode()" id="auth-toggle-btn" class="text-sm font-medium text-primary hover:underline outline-none dynamic-text">Belum punya akun? Daftar</button>
+        
+        <div class="p-3 bg-blue-50 text-blue-700 rounded-xl text-xs text-left flex items-start gap-2 border border-blue-100">
+          <i class="ph ph-info text-lg shrink-0"></i>
+          <p>Agar bisa diakses di perangkat lain, gunakan fitur <b>Share Link</b> pada aplikasi ini dan buka link tersebut di perangkat kedua.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -133,7 +123,7 @@
       </nav>
       
       <div class="p-4 border-t border-gray-200">
-        <div class="mb-4 text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">Halo, <span id="display-username-desktop">User</span></div>
+        <div class="mb-4 text-xs font-semibold text-gray-400 uppercase tracking-wider px-2">Akun: <span id="display-username-desktop" class="text-primary font-bold">User</span></div>
         <button onclick="openModal('add-transaction')" class="dynamic-bg w-full bg-primary hover:opacity-90 text-white py-3 rounded-xl shadow-md font-medium flex justify-center items-center gap-2 transition-all transform hover:-translate-y-0.5">
           <i class="ph ph-plus-circle text-xl"></i>Catat Transaksi
         </button>
@@ -142,7 +132,6 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-gray-50/50 w-full">
-      
       <!-- Topbar (Mobile only) -->
       <header class="md:hidden bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10 shrink-0">
         <div class="flex items-center gap-2">
@@ -253,7 +242,7 @@
           <div class="flex justify-between items-end">
             <h2 class="text-2xl font-bold text-gray-800">Pengaturan</h2>
             <button onclick="handleLogout()" class="text-danger hover:bg-red-50 px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-colors border border-red-100">
-              <i class="ph ph-sign-out"></i> Keluar
+              <i class="ph ph-sign-out"></i> Keluar Akun
             </button>
           </div>
 
@@ -299,7 +288,6 @@
             </div>
           </div>
 
-          <!-- Preferensi Biasa -->
           <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
             <div class="p-6 border-b border-gray-100">
               <h3 class="text-lg font-bold text-gray-800 mb-4">Preferensi Umum</h3>
@@ -317,23 +305,14 @@
                 </button>
               </div>
             </div>
-
+            
             <div class="p-6 bg-gray-50/50">
-              <h3 class="text-lg font-bold text-gray-800 mb-2">Manajemen Data Akun</h3>
-              <p class="text-sm text-gray-500 mb-5">Data ini disimpan khusus untuk pengguna: <b id="settings-username-display" class="text-gray-700"></b>.</p>
+              <h3 class="text-lg font-bold text-gray-800 mb-2">Status Akun Cloud</h3>
+              <p class="text-sm text-gray-500 mb-5">Data Anda otomatis tersinkronisasi ke server. Login sebagai: <b id="settings-username-display" class="text-gray-700"></b>.</p>
               
               <div class="flex flex-wrap gap-3">
                 <button onclick="exportData()" class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm">
-                  <i class="ph ph-export text-lg"></i> Backup Data
-                </button>
-                
-                <label class="flex items-center gap-2 bg-white border border-gray-200 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors shadow-sm">
-                  <i class="ph ph-download-simple text-lg"></i> Restore Data
-                  <input type="file" id="import-file" accept=".json" class="hidden" onchange="importData(event)">
-                </label>
-
-                <button onclick="factoryReset()" class="flex items-center gap-2 bg-red-50 text-red-600 border border-red-100 px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors md:ml-auto w-full md:w-auto justify-center">
-                  <i class="ph ph-trash text-lg"></i> Hapus Data Akun Ini
+                  <i class="ph ph-export text-lg"></i> Backup Lokal (JSON)
                 </button>
               </div>
             </div>
@@ -364,12 +343,10 @@
         </button>
       </nav>
     </main>
-  </div> <!-- End of App Container -->
+  </div> 
 
-  <!-- MODALS OVERLAY -->
   <div id="modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 modal-enter flex items-center justify-center p-4 hidden">
-    
-    <!-- MODAL: ADD TRANSACTION -->
+    <!-- ADD TRANSACTION -->
     <div id="modal-add-transaction" class="bg-white rounded-3xl w-full max-w-md shadow-2xl hidden flex-col overflow-hidden max-h-[90vh]">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50/50">
         <h3 class="text-lg font-bold text-gray-800">Catat Transaksi</h3>
@@ -387,7 +364,7 @@
             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Jumlah Uang</label>
             <div class="relative">
               <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-lg" id="tx-currency-symbol">Rp</span>
-              <input type="number" id="tx-amount" required min="1" step="any" class="w-full pl-12 pr-4 py-3.5 text-2xl font-black border border-gray-200 rounded-2xl focus:ring-4 focus:ring-primary/10 outline-none text-gray-800 transition-shadow dynamic-focus" placeholder="0">
+              <input type="number" id="tx-amount" required min="1" step="any" class="w-full pl-12 pr-4 py-3.5 text-2xl font-black border border-gray-200 rounded-2xl outline-none text-gray-800 transition-shadow dynamic-focus" placeholder="0">
             </div>
           </div>
           <div class="grid grid-cols-2 gap-4">
@@ -421,7 +398,7 @@
       </div>
     </div>
 
-    <!-- MODAL: ADD WALLET -->
+    <!-- ADD WALLET -->
     <div id="modal-add-wallet" class="bg-white rounded-3xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
         <h3 class="text-lg font-bold text-gray-800">Tambah Dompet Baru</h3>
@@ -437,7 +414,7 @@
       </div>
     </div>
 
-    <!-- MODAL: ADD GOAL & UPDATE GOAL -->
+    <!-- ADD & UPDATE GOAL -->
     <div id="modal-add-goal" class="bg-white rounded-3xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
         <h3 class="text-lg font-bold text-gray-800">Buat Target Finansial</h3>
@@ -453,7 +430,6 @@
         </form>
       </div>
     </div>
-
     <div id="modal-update-goal" class="bg-white rounded-3xl w-full max-w-sm shadow-2xl hidden flex-col overflow-hidden">
       <div class="flex justify-between items-center p-5 border-b border-gray-100 bg-gray-50">
         <h3 class="text-lg font-bold text-gray-800">Setor Tabungan</h3>
@@ -469,7 +445,7 @@
     </div>
   </div>
 
-  <!-- CUSTOM CONFIRM DIALOG -->
+  <!-- CONFIRM DIALOG -->
   <div id="confirm-overlay" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[60] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-6 text-center transform transition-transform scale-95" id="confirm-box">
       <div class="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 text-danger border-4 border-red-100"><i class="ph ph-warning-circle text-3xl"></i></div>
@@ -482,72 +458,96 @@
     </div>
   </div>
 
-  <!-- MODAL: POP UP INSTALL PWA KHUSUS -->
+  <!-- INSTALL PWA DIALOG -->
   <div id="modal-pwa-install" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden flex items-end md:items-center justify-center pb-0 md:p-4 transition-opacity duration-300 opacity-0">
     <div id="pwa-panel" class="bg-white w-full max-w-md rounded-t-3xl md:rounded-3xl shadow-2xl overflow-hidden transform translate-y-full md:translate-y-10 transition-transform duration-500 ease-out flex flex-col relative">
       <div class="dynamic-bg absolute top-0 left-0 right-0 h-32 bg-primary z-0 rounded-t-3xl opacity-10"></div>
-      
       <div class="p-6 relative z-10 flex flex-col items-center text-center mt-4">
         <div class="w-24 h-24 bg-white p-2 rounded-3xl shadow-xl border border-gray-100 mb-4 transform -translate-y-12 relative">
           <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
-          <div class="absolute -bottom-2 -right-2 bg-success text-white w-8 h-8 rounded-full flex justify-center items-center border-4 border-white shadow-sm">
-            <i class="ph ph-check-circle text-lg"></i>
-          </div>
+          <div class="absolute -bottom-2 -right-2 bg-success text-white w-8 h-8 rounded-full flex justify-center items-center border-4 border-white shadow-sm"><i class="ph ph-check-circle text-lg"></i></div>
         </div>
-
-        <h2 class="text-2xl font-black text-gray-900 -mt-8 mb-2">
-          Instal <span id="install-popup-app-name" class="dynamic-text text-primary">FinPro</span>
-        </h2>
-        <p class="text-sm text-gray-500 mb-6 px-4">
-          Bukan sekadar pintasan! Instal sebagai <b>Aplikasi Android Sesungguhnya (WebAPK)</b>. Akses lebih cepat, mendukung mode offline, dan layar penuh tanpa address bar browser.
-        </p>
-
-        <div class="w-full bg-gray-50 rounded-2xl p-4 flex flex-col gap-3 mb-6 border border-gray-100 text-left">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex justify-center items-center"><i class="ph ph-lightning"></i></div>
-            <span class="text-sm font-semibold text-gray-700">Kinerja secepat aplikasi native</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex justify-center items-center"><i class="ph ph-wifi-slash"></i></div>
-            <span class="text-sm font-semibold text-gray-700">Tetap berfungsi saat offline</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex justify-center items-center"><i class="ph ph-app-window"></i></div>
-            <span class="text-sm font-semibold text-gray-700">Tampil mandiri di App Drawer</span>
-          </div>
-        </div>
-
+        <h2 class="text-2xl font-black text-gray-900 -mt-8 mb-2">Instal <span id="install-popup-app-name" class="dynamic-text text-primary">FinPro</span></h2>
+        <p class="text-sm text-gray-500 mb-6 px-4">Bukan sekadar pintasan! Instal sebagai Aplikasi Android (WebAPK) agar mendukung mode fullscreen dan akses lebih optimal.</p>
         <div class="w-full flex flex-col gap-3">
-          <button id="pwa-btn-confirm-install" class="dynamic-bg w-full py-4 bg-primary text-white font-bold rounded-2xl text-lg shadow-lg shadow-primary/30 flex justify-center items-center gap-2 hover:scale-[1.02] transition-transform">
-            <i class="ph ph-download-simple text-xl"></i> Instal Aplikasi Sekarang
-          </button>
-          <button id="pwa-btn-cancel" class="w-full py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-2xl transition-colors">
-            Nanti Saja
-          </button>
+          <button id="pwa-btn-confirm-install" class="dynamic-bg w-full py-4 bg-primary text-white font-bold rounded-2xl text-lg shadow-lg shadow-primary/30 flex justify-center items-center gap-2 hover:scale-[1.02] transition-transform"><i class="ph ph-download-simple text-xl"></i> Instal Aplikasi Sekarang</button>
+          <button id="pwa-btn-cancel" class="w-full py-3 text-gray-500 font-bold hover:bg-gray-100 rounded-2xl transition-colors">Nanti Saja</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- TOAST CONTAINER -->
   <div id="toast-container" class="fixed top-4 right-4 z-[110] flex flex-col gap-3 pointer-events-none"></div>
 
-  <script>
-    /* ================= INITIALIZATION & AUTHENTICATION LOGIC ================= */
-    const USERS_DB_KEY = 'finpro_users_registry';
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- TEKNIK CACHING KONFIGURASI LINTAS PERANGKAT ---
+    // Agar saat user menginstal PWA, aplikasi tetap mengenali database server yang sama.
+    let fbConfigRaw = null;
+    let activeAppId = 'finpro-app-id';
+    let activeAuthToken = null;
+
+    if (typeof __firebase_config !== 'undefined') {
+        fbConfigRaw = __firebase_config;
+        localStorage.setItem('finpro_env_fb_config', __firebase_config);
+    } else {
+        fbConfigRaw = localStorage.getItem('finpro_env_fb_config');
+    }
+
+    if (typeof __app_id !== 'undefined') {
+        activeAppId = __app_id;
+        localStorage.setItem('finpro_env_app_id', __app_id);
+    } else {
+        const savedAppId = localStorage.getItem('finpro_env_app_id');
+        if (savedAppId) activeAppId = savedAppId;
+    }
+
+    if (typeof __initial_auth_token !== 'undefined') {
+        activeAuthToken = __initial_auth_token;
+        localStorage.setItem('finpro_env_auth_token', __initial_auth_token);
+    } else {
+        activeAuthToken = localStorage.getItem('finpro_env_auth_token');
+    }
+
+    const firebaseConfig = fbConfigRaw ? JSON.parse(fbConfigRaw) : null;
+    
+    let app, auth, db;
+    if (firebaseConfig) {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+    } else {
+        // Fallback UI Jika user membuka tanpa jalur resmi Canvas Share Link
+        document.getElementById('auth-subtitle').innerHTML = '<span class="text-danger font-bold"><i class="ph ph-warning"></i> Koneksi Cloud Terputus.<br>Harap buka aplikasi ini melalui Share Link yang resmi agar database terhubung.</span>';
+        document.getElementById('auth-submit-btn').disabled = true;
+        document.getElementById('auth-submit-btn').classList.add('opacity-50', 'cursor-not-allowed');
+    }
+
+    async function authenticateEnvironment() {
+      if (!auth.currentUser) {
+        if (activeAuthToken) {
+          await signInWithCustomToken(auth, activeAuthToken);
+        } else {
+          await signInAnonymously(auth);
+        }
+      }
+    }
+
+    /* ================= INITIALIZATION & STATE ================= */
     let currentUser = null;
+    let state = null;
+    let unsubscribeSync = null; 
+    let charts = { cashflow: null, category: null };
 
     const defaultCategories = [
       { id: 'c1', name: 'Makanan & Minuman', type: 'expense', icon: 'hamburger', color: '#F59E0B' },
       { id: 'c2', name: 'Transportasi', type: 'expense', icon: 'car', color: '#3B82F6' },
       { id: 'c3', name: 'Belanja', type: 'expense', icon: 'shopping-bag', color: '#EC4899' },
       { id: 'c4', name: 'Tagihan & Utilitas', type: 'expense', icon: 'receipt', color: '#8B5CF6' },
-      { id: 'c5', name: 'Kesehatan', type: 'expense', icon: 'heartbeat', color: '#EF4444' },
-      { id: 'c6', name: 'Hiburan', type: 'expense', icon: 'film-strip', color: '#14B8A6' },
-      { id: 'c7', name: 'Gaji', type: 'income', icon: 'money', color: '#10B981' },
-      { id: 'c8', name: 'Investasi', type: 'income', icon: 'chart-line-up', color: '#0EA5E9' },
-      { id: 'c9', name: 'Pemasukan Lain', type: 'income', icon: 'plus-circle', color: '#6B7280' },
-      { id: 'c10', name: 'Pengeluaran Lain', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
+      { id: 'c7', name: 'Gaji', type: 'income', icon: 'money', color: '#10B981' }
     ];
 
     const defaultState = {
@@ -561,19 +561,7 @@
       goals: []
     };
 
-    let state = null; // Data kosong sampai user berhasil login
-    let charts = { cashflow: null, category: null };
-
-    // Mengecek apakah user sebelumnya masih login
-    function checkSession() {
-      const savedUser = sessionStorage.getItem('finpro_active_user');
-      if (savedUser) {
-        processLoginSuccess(savedUser);
-      }
-      // Jika tidak, biarkan default layar Auth muncul
-    }
-
-    function toggleAuthMode() {
+    window.toggleAuthMode = function() {
       const isReg = document.getElementById('auth-is-reg');
       const title = document.getElementById('auth-title');
       const btn = document.getElementById('auth-submit-btn');
@@ -587,42 +575,70 @@
       } else {
         isReg.value = 'false';
         title.innerText = 'Masuk FinPro';
-        btn.innerText = 'Masuk Sekarang';
+        btn.innerText = 'Masuk ke Akun';
         toggleBtn.innerText = 'Belum punya akun? Daftar';
       }
-    }
+    };
 
-    document.getElementById('form-auth').addEventListener('submit', (e) => {
+    document.getElementById('form-auth').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const username = document.getElementById('auth-user').value.trim();
+      
+      // Membersihkan spasi dan konversi huruf kecil agar akun persisten meski typo kapital
+      const rawUser = document.getElementById('auth-user').value.trim();
+      const username = rawUser.toLowerCase().replace(/\s+/g, '');
       const pass = document.getElementById('auth-pass').value;
       const isReg = document.getElementById('auth-is-reg').value === 'true';
+      const btn = document.getElementById('auth-submit-btn');
 
       if (!username || !pass) return showToast('Harap isi semua kolom!', 'warning');
 
-      let usersDb = JSON.parse(localStorage.getItem(USERS_DB_KEY) || '{}');
+      btn.disabled = true;
+      btn.innerText = 'Memproses ke Cloud...';
 
-      if (isReg) {
-        if (usersDb[username]) return showToast('Username sudah dipakai orang lain!', 'danger');
-        usersDb[username] = pass; // Di dunia nyata password harus di-hash (enkripsi)
-        localStorage.setItem(USERS_DB_KEY, JSON.stringify(usersDb));
-        showToast('Pendaftaran berhasil! Silakan login.', 'success');
-        toggleAuthMode();
-        document.getElementById('auth-pass').value = '';
-      } else {
-        if (!usersDb[username] || usersDb[username] !== pass) {
-          return showToast('Username atau password salah!', 'danger');
+      try {
+        await authenticateEnvironment();
+        
+        // Membaca dari jalur database publik yang sah di dalam env
+        const accountRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'accounts', username);
+        const docSnap = await getDoc(accountRef);
+
+        if (isReg) {
+          if (docSnap.exists()) {
+            showToast('Username sudah dipakai orang lain!', 'danger');
+          } else {
+            // Pembuatan Akun Baru (Password dan State default)
+            await setDoc(accountRef, { password: pass, createdAt: Date.now() });
+            
+            const stateRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'user_states', username);
+            await setDoc(stateRef, defaultState);
+
+            showToast('Pendaftaran berhasil! Silakan login.', 'success');
+            window.toggleAuthMode();
+            document.getElementById('auth-pass').value = '';
+          }
+        } else {
+          if (!docSnap.exists()) {
+            showToast('Akun tidak ditemukan. Pastikan Anda membuka menggunakan Share Link yang sama!', 'danger');
+          } else if (docSnap.data().password !== pass) {
+            showToast('Password salah!', 'danger');
+          } else {
+            showToast(`Selamat datang kembali, ${username}!`, 'success');
+            processLoginSuccess(username);
+          }
         }
-        showToast(`Selamat datang kembali, ${username}!`, 'success');
-        processLoginSuccess(username);
+      } catch (error) {
+        console.error("Auth error:", error);
+        showToast('Gagal terhubung ke Cloud. Pastikan internet stabil.', 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = isReg ? 'Buat Akun Baru' : 'Masuk ke Akun';
       }
     });
 
-    function processLoginSuccess(username) {
+    async function processLoginSuccess(username) {
       currentUser = username;
       sessionStorage.setItem('finpro_active_user', username);
       
-      // Update UI untuk menunjukkan aplikasi utama
       document.getElementById('auth-container').classList.add('hidden');
       document.getElementById('app-container').classList.remove('hidden');
       document.getElementById('app-container').classList.add('flex');
@@ -630,20 +646,55 @@
       document.getElementById('display-username-desktop').innerText = username;
       document.getElementById('settings-username-display').innerText = username;
 
-      loadData();
-      renderApp();
-      
-      // Delay render chart untuk memastikan layout DOM selesai dilukis
-      setTimeout(initCharts, 200);
+      startCloudSync(username);
     }
 
-    function handleLogout() {
+    function startCloudSync(username) {
+      const stateRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'user_states', username);
+      
+      // onSnapshot membuat data tersinkron secara real-time ke semua device yang login
+      unsubscribeSync = onSnapshot(stateRef, (docSnap) => {
+        if (docSnap.exists()) {
+          state = docSnap.data();
+          state.settings = state.settings || defaultState.settings;
+          state.wallets = state.wallets || defaultState.wallets;
+          state.categories = state.categories || defaultState.categories;
+          state.transactions = state.transactions || [];
+          state.goals = state.goals || [];
+        } else {
+          state = structuredClone(defaultState);
+          setDoc(stateRef, state);
+        }
+        
+        renderApp();
+        setTimeout(initCharts, 100); 
+      }, (error) => {
+        console.error("Sync error:", error);
+        showToast("Terputus dari server real-time", "warning");
+      });
+    }
+
+    async function saveData() {
+      if(!currentUser || !state) return;
+      renderApp(); // Optimistic update
+      
+      try {
+        const stateRef = doc(db, 'artifacts', activeAppId, 'public', 'data', 'user_states', currentUser);
+        await setDoc(stateRef, state);
+      } catch (e) {
+        console.error("Save error", e);
+        showToast("Gagal menyimpan ke Cloud, cek koneksi Anda.", "danger");
+      }
+    }
+
+    window.handleLogout = function() {
       showConfirm("Yakin ingin keluar dari akun ini?", () => {
         sessionStorage.removeItem('finpro_active_user');
         currentUser = null;
-        state = null; // Hapus state dari memori
+        state = null;
         
-        // Reset UI Auth Form
+        if(unsubscribeSync) unsubscribeSync(); 
+        
         document.getElementById('auth-user').value = '';
         document.getElementById('auth-pass').value = '';
         
@@ -652,58 +703,21 @@
         document.getElementById('auth-container').classList.remove('hidden');
         showToast("Berhasil keluar.", "success");
       });
-    }
+    };
 
-    /* ================= DATA MANAGEMENT ================= */
-    function loadData() {
-      if(!currentUser) return;
-      try {
-        const data = localStorage.getItem(`finpro_data_${currentUser}`);
-        if (data) {
-          let parsed = JSON.parse(data);
-          parsed.wallets = parsed.wallets || defaultState.wallets;
-          parsed.categories = parsed.categories || defaultState.categories;
-          parsed.transactions = parsed.transactions || [];
-          parsed.goals = parsed.goals || [];
-          parsed.settings = parsed.settings || defaultState.settings;
-          state = parsed;
-          return;
-        }
-      } catch (e) { console.error("Gagal load data", e); }
-      // Jika error atau data tidak ada, gunakan default state
-      state = structuredClone(defaultState);
-    }
-
-    function saveData() {
-      if(!currentUser || !state) return;
-      localStorage.setItem(`finpro_data_${currentUser}`, JSON.stringify(state));
-      renderApp();
-    }
-
-    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
-
-    /* ================= PWA & WEB APP BUILDER LOGIC ================= */
     let currentManifestUrl = null;
     let deferredPrompt = null;
-    
-    function getGeneratedIconUrl(text, bgColorHex) {
-      return "https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg";
-    }
 
     function buildPWA(appName, themeColor) {
-      const iconUrl = getGeneratedIconUrl(appName, themeColor);
-      
+      const iconUrl = "https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg";
       document.querySelectorAll('.app-logo-img').forEach(img => { img.src = iconUrl; });
 
       const manifestContent = {
-        "name": appName,
-        "short_name": appName,
+        "name": appName, "short_name": appName,
         "start_url": window.location.pathname + window.location.search,
-        "display": "standalone",
-        "orientation": "portrait",
-        "background_color": "#F3F4F6",
-        "theme_color": themeColor,
-        "description": "Aplikasi Manajemen Keuangan Cerdas",
+        "display": "standalone", "orientation": "portrait",
+        "background_color": "#F3F4F6", "theme_color": themeColor,
+        "description": "Aplikasi Manajemen Keuangan",
         "prefer_related_applications": false,
         "icons": [
           { "src": iconUrl, "sizes": "192x192", "type": "image/jpeg", "purpose": "any maskable" },
@@ -725,7 +739,6 @@
       document.head.appendChild(manifestLink);
       
       document.getElementById('meta-theme-color').setAttribute('content', themeColor);
-      
       document.getElementById('sidebar-app-name').innerText = appName;
       document.getElementById('mobile-app-name').innerText = appName;
       document.getElementById('install-popup-app-name').innerText = appName;
@@ -733,9 +746,7 @@
 
       document.documentElement.style.setProperty('--theme-color', themeColor);
       document.querySelectorAll('.dynamic-bg').forEach(el => { el.style.backgroundColor = themeColor; });
-      document.querySelectorAll('.dynamic-bg-light').forEach(el => { el.style.backgroundColor = `${themeColor}15`; }); // 15 = hex alpha
       document.querySelectorAll('.dynamic-text').forEach(el => { el.style.color = themeColor; });
-      document.querySelectorAll('.dynamic-border').forEach(el => { el.style.borderColor = themeColor; });
       document.querySelectorAll('.dynamic-gradient-bg').forEach(el => {
          el.style.backgroundImage = `linear-gradient(135deg, ${themeColor}, #000000 200%)`;
       });
@@ -744,38 +755,26 @@
     document.getElementById('btn-apply-builder').addEventListener('click', () => {
        const appName = document.getElementById('builder-name').value || "FinPro";
        const themeColor = document.getElementById('builder-color').value || "#4F46E5";
-       
        buildPWA(appName, themeColor);
-       if(state) {
-          state.settings.appName = appName;
-          state.settings.themeColor = themeColor;
-          saveData(); 
-       }
-       showToast("Identitas Web App berhasil diterapkan! Siap diinstal.", "success");
+       window.saveSettings();
+       showToast("Identitas Web App diterapkan! Siap diinstal.", "success");
     });
 
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'finpro-webapk-v4';
         self.addEventListener('install', (e) => self.skipWaiting());
         self.addEventListener('activate', (e) => self.clients.claim());
         self.addEventListener('fetch', (e) => {
-          e.respondWith(
-            fetch(e.request).catch(() => new Response('Aplikasi sedang berjalan dalam mode Offline.', { status: 200, headers: {'Content-Type':'text/plain'} }))
-          );
+          e.respondWith(fetch(e.request).catch(() => new Response('App is Offline.', { status: 200 })));
         });
       `;
       const blobSW = new Blob([swCode], {type: 'application/javascript'});
-      const swUrl = URL.createObjectURL(blobSW);
-      navigator.serviceWorker.register(swUrl).then(reg => { console.log('SW Ready'); }).catch(err => console.log('SW Failed', err));
+      navigator.serviceWorker.register(URL.createObjectURL(blobSW)).catch(err => console.log('SW Reg Failed', err));
     }
 
     const installModal = document.getElementById('modal-pwa-install');
     const installPanel = document.getElementById('pwa-panel');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault(); deferredPrompt = e;
-    });
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
 
     function openInstallModal() {
       installModal.classList.remove('hidden');
@@ -798,25 +797,21 @@
       if (deferredPrompt) {
         closeInstallModal(); deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
-        if(outcome === 'accepted') { showToast("Proses Instalasi WebAPK Dimulai...", "success"); }
+        if(outcome === 'accepted') showToast("Instalasi WebAPK Dimulai...", "success");
         deferredPrompt = null;
       } else {
-        closeInstallModal(); showToast("Perangkat tidak merespon/sudah diinstal. Cek layar utama Anda.", "warning");
+        closeInstallModal(); showToast("Gunakan menu 'Tambahkan ke Layar Utama' browser Anda.", "warning");
       }
     });
 
     document.getElementById('pwa-btn-cancel').addEventListener('click', closeInstallModal);
-    installModal.addEventListener('click', (e) => { if(e.target === installModal) closeInstallModal(); });
-    window.addEventListener('appinstalled', () => { closeInstallModal(); showToast("🎉 Aplikasi berhasil diinstal!", "success"); deferredPrompt = null; });
 
-    /* ================= HELPER & UI LOGIC ================= */
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
       let bg = type === 'success' ? 'bg-gray-900 border-l-4 border-success' : (type === 'warning' ? 'bg-gray-900 border-l-4 border-warning' : 'bg-danger text-white border-l-4 border-white');
       let icon = type === 'success' ? 'check-circle text-success' : (type === 'warning' ? 'warning text-warning' : 'warning-circle text-white');
-      
-      toast.className = `toast-enter ${bg} text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 pointer-events-auto max-w-sm mb-2 backdrop-blur-md bg-opacity-95`;
+      toast.className = `toast-enter ${bg} text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 pointer-events-auto max-w-sm mb-2`;
       toast.innerHTML = `<i class="ph ph-${icon} text-2xl"></i><span class="text-sm font-semibold">${message}</span>`;
       container.appendChild(toast);
       setTimeout(() => {
@@ -828,88 +823,69 @@
     let confirmCallback = null;
     function showConfirm(message, callback) {
       document.getElementById('confirm-msg').innerText = message;
-      const overlay = document.getElementById('confirm-overlay');
-      const box = document.getElementById('confirm-box');
-      overlay.classList.remove('hidden');
-      setTimeout(() => box.classList.replace('scale-95', 'scale-100'), 10);
+      document.getElementById('confirm-overlay').classList.remove('hidden');
+      setTimeout(() => document.getElementById('confirm-box').classList.replace('scale-95', 'scale-100'), 10);
       confirmCallback = callback;
     }
     document.getElementById('confirm-btn-no').onclick = closeConfirm;
     document.getElementById('confirm-btn-yes').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirm(); };
     function closeConfirm() {
-      const overlay = document.getElementById('confirm-overlay');
-      const box = document.getElementById('confirm-box');
-      box.classList.replace('scale-100', 'scale-95');
-      setTimeout(() => overlay.classList.add('hidden'), 150);
-      confirmCallback = null;
+      document.getElementById('confirm-box').classList.replace('scale-100', 'scale-95');
+      setTimeout(() => document.getElementById('confirm-overlay').classList.add('hidden'), 150);
     }
 
+    function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
     function formatMoney(amount) {
       const code = state ? (state.settings.currency || 'IDR') : 'IDR';
-      const locales = code === 'IDR' ? 'id-ID' : 'en-US';
       const fraction = code === 'IDR' ? 0 : 2;
-      return new Intl.NumberFormat(locales, { style: 'currency', currency: code, minimumFractionDigits: fraction, maximumFractionDigits: fraction }).format(amount);
+      return new Intl.NumberFormat(code === 'IDR'?'id-ID':'en-US', { style: 'currency', currency: code, minimumFractionDigits: fraction }).format(amount);
     }
-
     function formatDate(dateString) { return new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }); }
     function getCategory(id) { return state.categories.find(c => c.id === id) || { name: 'Kategori Dihapus', icon: 'question', color: '#9CA3AF' }; }
     function getWallet(id) { return state.wallets.find(w => w.id === id) || { name: 'Dompet Dihapus', color: '#9CA3AF' }; }
     function getCurrentMonthStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; }
 
-    function switchTab(tabId) {
+    window.switchTab = function(tabId) {
       document.querySelectorAll('main > div > section').forEach(el => { el.classList.add('hidden'); el.classList.remove('block'); });
-      const target = document.getElementById(`view-${tabId}`);
-      if(target) { target.classList.remove('hidden'); target.classList.add('block'); }
-
+      document.getElementById(`view-${tabId}`).classList.remove('hidden'); 
+      document.getElementById(`view-${tabId}`).classList.add('block');
+      
       document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active', 'bg-gray-50'));
-      const desktopNav = document.getElementById(`nav-${tabId}`);
-      if(desktopNav) desktopNav.classList.add('active');
-
-      const mobNav = document.getElementById(`mob-${tabId}`);
-      if(mobNav) {
-        document.querySelectorAll('nav.md\\:hidden .nav-item').forEach(el => { 
-            el.classList.remove('active'); 
-            el.classList.add('text-gray-500'); 
-            el.style.color = ''; 
-        });
-        mobNav.classList.remove('text-gray-500'); 
-        mobNav.classList.add('active');
-        const themeColor = state ? (state.settings.themeColor || '#4F46E5') : '#4F46E5';
-        mobNav.style.color = themeColor;
+      if(document.getElementById(`nav-${tabId}`)) document.getElementById(`nav-${tabId}`).classList.add('active');
+      
+      if(document.getElementById(`mob-${tabId}`)) {
+        document.querySelectorAll('nav.md\\:hidden .nav-item').forEach(el => { el.classList.remove('active'); el.classList.add('text-gray-500'); el.style.color = ''; });
+        const mobNav = document.getElementById(`mob-${tabId}`);
+        mobNav.classList.remove('text-gray-500'); mobNav.classList.add('active');
+        mobNav.style.color = state ? state.settings.themeColor : '#4F46E5';
       }
       if(tabId === 'dashboard') initCharts();
-    }
+    };
 
-    function openModal(modalId) {
-      const modalOverlay = document.getElementById('modal-overlay');
-      const targetModal = document.getElementById(`modal-${modalId}`);
-      
-      modalOverlay.classList.remove('hidden');
-      targetModal.classList.remove('hidden');
+    window.openModal = function(modalId) {
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      document.getElementById(`modal-${modalId}`).classList.remove('hidden');
       setTimeout(() => {
-         modalOverlay.classList.add('modal-enter-active');
-         targetModal.classList.add('modal-enter-active');
+         document.getElementById('modal-overlay').classList.add('modal-enter-active');
+         document.getElementById(`modal-${modalId}`).classList.add('modal-enter-active');
       }, 10);
-
       if(modalId === 'add-transaction') {
         document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
-        setTxType('expense'); populateSelects();
+        window.setTxType('expense'); populateSelects();
         document.getElementById('tx-currency-symbol').innerText = state.settings.currency === 'IDR' ? 'Rp' : (state.settings.currency === 'USD' ? '$' : '€');
       }
-    }
+    };
 
-    function closeModals() {
-      const modalOverlay = document.getElementById('modal-overlay');
-      modalOverlay.classList.remove('modal-enter-active');
-      document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { el.classList.remove('modal-enter-active'); });
+    window.closeModals = function() {
+      document.getElementById('modal-overlay').classList.remove('modal-enter-active');
+      document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => el.classList.remove('modal-enter-active'));
       setTimeout(() => {
-          modalOverlay.classList.add('hidden');
-          document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { el.classList.add('hidden'); });
+          document.getElementById('modal-overlay').classList.add('hidden');
+          document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => el.classList.add('hidden'));
       }, 300);
-    }
-    document.getElementById('modal-overlay').addEventListener('click', (e) => { if(e.target.id === 'modal-overlay') closeModals(); });
+    };
 
-    function setTxType(type) {
+    window.setTxType = function(type) {
       document.getElementById('tx-type').value = type;
       const btns = { 'expense': document.getElementById('btn-type-expense'), 'income': document.getElementById('btn-type-income'), 'transfer': document.getElementById('btn-type-transfer') };
       for(let key in btns) btns[key].className = 'flex-1 py-2 text-sm font-medium rounded-lg text-gray-500 hover:text-gray-700 transition-all';
@@ -926,15 +902,14 @@
         wrapFrom.className = "col-span-2"; document.getElementById('lbl-wallet-from').innerText = "Masuk Ke Dompet";
         document.getElementById('tx-wallet').required = true; document.getElementById('tx-wallet-to').required = false;
       } else if (type === 'transfer') {
-        const themeColor = state.settings.themeColor || '#4F46E5';
         btns[type].className = 'flex-1 py-2 text-sm font-bold rounded-lg bg-white shadow transition-all';
-        btns[type].style.color = themeColor;
+        btns[type].style.color = state ? state.settings.themeColor : '#4F46E5';
         document.getElementById('wrap-category').classList.add('hidden'); document.getElementById('wrap-wallet-to').classList.remove('hidden');
         wrapFrom.className = ""; document.getElementById('lbl-wallet-from').innerText = "Dari Dompet";
         document.getElementById('tx-wallet').required = true; document.getElementById('tx-wallet-to').required = true;
       }
       populateSelects(type);
-    }
+    };
 
     function populateSelects(type = 'expense') {
       const catSelect = document.getElementById('tx-category'); catSelect.innerHTML = '';
@@ -951,11 +926,10 @@
       const date = document.getElementById('tx-date').value; const note = document.getElementById('tx-note').value.trim();
       const walletId = document.getElementById('tx-wallet').value;
       let wallet = state.wallets.find(w => w.id === walletId);
-      if(!wallet) return showToast("Pilih dompet yang valid", "warning");
 
       if (type === 'transfer') {
         const toWalletId = document.getElementById('tx-wallet-to').value;
-        if(walletId === toWalletId) return showToast("Dompet asal dan tujuan tidak boleh sama", "warning");
+        if(walletId === toWalletId) return showToast("Dompet asal dan tujuan harus berbeda", "warning");
         let toWallet = state.wallets.find(w => w.id === toWalletId);
         wallet.balance -= amount; toWallet.balance += amount;
         state.transactions.push({ id: generateId(), type, amount, date, walletId, toWalletId, note: note || `Transfer ke ${toWallet.name}`, timestamp: Date.now() });
@@ -965,46 +939,42 @@
         if (type === 'income') wallet.balance += amount;
         state.transactions.push({ id: generateId(), type, amount, date, categoryId, walletId, note, timestamp: Date.now() });
       }
-      e.target.reset(); closeModals(); saveData(); showToast("Transaksi berhasil dicatat!");
+      e.target.reset(); window.closeModals(); saveData(); showToast("Transaksi dicatat ke Cloud!");
     });
 
-    function deleteTransaction(id) {
-      showConfirm("Hapus transaksi ini? Saldo dompet akan disesuaikan kembali secara otomatis.", () => {
+    window.deleteTransaction = function(id) {
+      showConfirm("Hapus transaksi ini dari sinkronisasi Cloud?", () => {
         const txIndex = state.transactions.findIndex(t => t.id === id); if(txIndex === -1) return;
         const tx = state.transactions[txIndex];
         if(tx.type === 'expense') { let w = state.wallets.find(w => w.id === tx.walletId); if(w) w.balance += tx.amount; }
         else if (tx.type === 'income') { let w = state.wallets.find(w => w.id === tx.walletId); if(w) w.balance -= tx.amount; }
         else if (tx.type === 'transfer') { let wFrom = state.wallets.find(w => w.id === tx.walletId); let wTo = state.wallets.find(w => w.id === tx.toWalletId); if(wFrom) wFrom.balance += tx.amount; if(wTo) wTo.balance -= tx.amount; }
-        state.transactions.splice(txIndex, 1); saveData(); showToast("Transaksi berhasil dihapus");
+        state.transactions.splice(txIndex, 1); saveData(); showToast("Transaksi dihapus secara permanen");
       });
-    }
+    };
 
     document.getElementById('form-wallet').addEventListener('submit', (e) => {
       e.preventDefault(); const name = document.getElementById('wallet-name').value.trim(); const balance = parseFloat(document.getElementById('wallet-balance').value); const color = document.getElementById('wallet-color').value;
-      state.wallets.push({ id: generateId(), name, balance, color }); e.target.reset(); closeModals(); saveData(); showToast("Dompet baru ditambahkan!");
+      state.wallets.push({ id: generateId(), name, balance, color }); e.target.reset(); window.closeModals(); saveData(); showToast("Dompet disimpan!");
     });
-    
-    function deleteWallet(id) {
-       if(state.wallets.length <= 1) return showToast("Anda harus memiliki setidaknya satu dompet.", "warning");
-       showConfirm("Yakin hapus dompet ini?", () => { state.wallets = state.wallets.filter(w => w.id !== id); saveData(); showToast("Dompet dihapus"); });
-    }
+    window.deleteWallet = function(id) {
+       if(state.wallets.length <= 1) return showToast("Sistem butuh minimal satu dompet", "warning");
+       showConfirm("Hapus dompet ini?", () => { state.wallets = state.wallets.filter(w => w.id !== id); saveData(); showToast("Dompet dihapus"); });
+    };
 
     document.getElementById('form-goal').addEventListener('submit', (e) => {
       e.preventDefault(); const name = document.getElementById('goal-name').value.trim(); const target = parseFloat(document.getElementById('goal-target').value); const saved = parseFloat(document.getElementById('goal-saved').value) || 0; const deadline = document.getElementById('goal-deadline').value;
-      state.goals.push({ id: generateId(), name, target, saved, deadline }); e.target.reset(); closeModals(); saveData(); showToast("Target tabungan dibuat!");
+      state.goals.push({ id: generateId(), name, target, saved, deadline }); e.target.reset(); window.closeModals(); saveData(); showToast("Target disimpan!");
     });
-
-    function deleteGoal(id) { showConfirm("Hapus target tabungan ini?", () => { state.goals = state.goals.filter(g => g.id !== id); saveData(); showToast("Target dihapus"); }); }
-    function openUpdateGoal(id) { document.getElementById('update-goal-id').value = id; document.getElementById('update-goal-amount').value = ''; openModal('update-goal'); }
-    
+    window.deleteGoal = function(id) { showConfirm("Hapus target?", () => { state.goals = state.goals.filter(g => g.id !== id); saveData(); showToast("Target dihapus"); }); };
+    window.openUpdateGoal = function(id) { document.getElementById('update-goal-id').value = id; document.getElementById('update-goal-amount').value = ''; window.openModal('update-goal'); };
     document.getElementById('form-update-goal').addEventListener('submit', (e) => {
       e.preventDefault(); const id = document.getElementById('update-goal-id').value; const amount = parseFloat(document.getElementById('update-goal-amount').value);
-      let goal = state.goals.find(g => g.id === id); if(goal && amount > 0) { goal.saved += amount; saveData(); closeModals(); showToast("Tabungan ditambahkan!"); }
+      let goal = state.goals.find(g => g.id === id); if(goal && amount > 0) { goal.saved += amount; saveData(); window.closeModals(); showToast("Progres ditambah!"); }
     });
 
     function renderApp() {
-      if(!state) return; // Mencegah crash jika state tidak ada
-      
+      if(!state) return;
       document.getElementById('builder-name').value = state.settings.appName;
       document.getElementById('builder-color').value = state.settings.themeColor;
       buildPWA(state.settings.appName, state.settings.themeColor);
@@ -1023,7 +993,6 @@
       document.getElementById('dash-expense').innerText = formatMoney(expenseMonth);
 
       renderTransactionList('recent-transactions-list', state.transactions.slice().sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5), true);
-      
       let filteredTx = state.transactions.filter(t => t.date.startsWith(txMonth));
       if(txTypeFilter !== 'all') filteredTx = filteredTx.filter(t => t.type === txTypeFilter);
       renderTransactionList('all-transactions-list', filteredTx.sort((a,b) => new Date(b.date) - new Date(a.date)), false);
@@ -1041,31 +1010,28 @@
       });
 
       const goalsGrid = document.getElementById('goals-grid'); goalsGrid.innerHTML = '';
-      if(state.goals.length === 0) goalsGrid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed text-gray-500"><i class="ph ph-target text-5xl mb-3 text-gray-300"></i><br>Belum ada target finansial.<br>Mulai menabung untuk impianmu!</div>`;
-      const themeColor = state.settings.themeColor;
+      if(state.goals.length === 0) goalsGrid.innerHTML = `<div class="col-span-full text-center py-12 bg-white rounded-2xl border border-gray-100 border-dashed text-gray-500"><i class="ph ph-target text-5xl mb-3 text-gray-300"></i><br>Belum ada target finansial.</div>`;
       state.goals.forEach(g => {
         const percent = Math.min(100, Math.round((g.saved / g.target) * 100)); const isComplete = percent >= 100;
         goalsGrid.innerHTML += `
-          <div class="bg-white p-5 rounded-2xl border ${isComplete ? 'border-success/40 bg-success/5 shadow-success/10' : 'border-gray-100'} shadow-sm relative group hover:shadow-md transition-shadow">
+          <div class="bg-white p-5 rounded-2xl border ${isComplete ? 'border-success/40 bg-success/5' : 'border-gray-100'} shadow-sm relative group hover:shadow-md transition-shadow">
             <div class="flex justify-between items-start mb-4">
-              <div><h3 class="text-lg font-bold text-gray-800">${g.name}</h3>${g.deadline ? `<p class="text-xs font-semibold text-gray-500 mt-1 flex items-center gap-1"><i class="ph ph-calendar"></i> Selesai: ${g.deadline}</p>` : ''}</div>
+              <div><h3 class="text-lg font-bold text-gray-800">${g.name}</h3>${g.deadline ? `<p class="text-xs font-semibold text-gray-500 mt-1"><i class="ph ph-calendar"></i> ${g.deadline}</p>` : ''}</div>
               <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                ${!isComplete ? `<button onclick="openUpdateGoal('${g.id}')" title="Setor Tabungan" class="text-gray-400 hover:text-success hover:bg-success/10 bg-white rounded-lg p-2 transition-colors"><i class="ph ph-plus text-lg"></i></button>` : ''}
-                <button onclick="deleteGoal('${g.id}')" title="Hapus Target" class="text-gray-400 hover:text-danger hover:bg-danger/10 bg-white rounded-lg p-2 transition-colors"><i class="ph ph-trash text-lg"></i></button>
+                ${!isComplete ? `<button onclick="openUpdateGoal('${g.id}')" class="text-gray-400 hover:text-success hover:bg-success/10 bg-white rounded-lg p-2"><i class="ph ph-plus text-lg"></i></button>` : ''}
+                <button onclick="deleteGoal('${g.id}')" class="text-gray-400 hover:text-danger hover:bg-danger/10 bg-white rounded-lg p-2"><i class="ph ph-trash text-lg"></i></button>
               </div>
             </div>
-            <div class="mb-2 flex justify-between text-sm font-bold"><span class="text-gray-800">${formatMoney(g.saved)}</span><span class="text-gray-400">${formatMoney(g.target)}</span></div>
-            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden"><div class="h-3 rounded-full ${isComplete ? 'bg-success' : 'dynamic-bg transition-all'}" style="width: ${percent}%; ${!isComplete ? 'background-color:'+themeColor+';' : ''} transition: width 1s ease-out"></div></div>
-            <p class="text-xs text-right mt-2 font-bold ${isComplete ? 'text-success' : 'dynamic-text'}" style="${!isComplete ? 'color:'+themeColor+';' : ''}">${percent}% Terkumpul ${isComplete ? '🎉' : ''}</p>
+            <div class="mb-2 flex justify-between text-sm font-bold"><span>${formatMoney(g.saved)}</span><span class="text-gray-400">${formatMoney(g.target)}</span></div>
+            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden"><div class="h-3 rounded-full ${isComplete ? 'bg-success' : 'dynamic-bg transition-all'}" style="width: ${percent}%; ${!isComplete ? 'background-color:'+state.settings.themeColor+';' : ''}"></div></div>
           </div>`;
       });
       document.getElementById('setting-currency').value = state.settings.currency;
-      if(!document.getElementById('view-dashboard').classList.contains('hidden')) initCharts();
     }
 
     function renderTransactionList(containerId, txArray, isCompact = false) {
       const container = document.getElementById(containerId);
-      if(txArray.length === 0) return container.innerHTML = `<div class="p-8 text-center text-gray-400 font-medium"><i class="ph ph-receipt text-5xl mb-2 text-gray-300"></i><p>Belum ada transaksi.</p></div>`;
+      if(txArray.length === 0) return container.innerHTML = `<div class="p-8 text-center text-gray-400 font-medium"><i class="ph ph-receipt text-5xl mb-2 text-gray-300"></i><p>Kosong.</p></div>`;
       let html = '';
       txArray.forEach(t => {
         let iconHtml, title, colorClass, amountPrefix, walletName;
@@ -1075,11 +1041,10 @@
           title = cat.name; colorClass = t.type === 'expense' ? 'text-gray-800' : 'text-success';
           amountPrefix = t.type === 'expense' ? '-' : '+'; walletName = getWallet(t.walletId).name;
         } else if (t.type === 'transfer') {
-           const themeColor = state.settings.themeColor;
-           iconHtml = `<div class="w-12 h-12 rounded-2xl flex items-center justify-center dynamic-text dynamic-border shadow-sm" style="color: ${themeColor}; background-color: ${themeColor}10; border: 1px solid ${themeColor}30;"><i class="ph ph-arrows-left-right text-2xl"></i></div>`;
+           iconHtml = `<div class="w-12 h-12 rounded-2xl flex items-center justify-center dynamic-text dynamic-border shadow-sm" style="color: ${state.settings.themeColor}; background-color: ${state.settings.themeColor}10; border: 1px solid ${state.settings.themeColor}30;"><i class="ph ph-arrows-left-right text-2xl"></i></div>`;
            title = 'Transfer Saldo'; colorClass = 'text-gray-500'; amountPrefix = ''; walletName = `${getWallet(t.walletId).name} ➝ ${getWallet(t.toWalletId).name}`;
         }
-        const noteDisplay = t.note ? `<span class="text-xs text-gray-500 truncate max-w-[150px] md:max-w-[300px] inline-block font-medium bg-gray-100 px-2 py-0.5 rounded ml-2">${t.note}</span>` : '';
+        const noteDisplay = t.note ? `<span class="text-xs text-gray-500 truncate inline-block font-medium bg-gray-100 px-2 py-0.5 rounded ml-2">${t.note}</span>` : '';
         html += `
           <div class="p-4 hover:bg-gray-50 flex items-center justify-between group transition-colors">
             <div class="flex items-center gap-4">${iconHtml}<div><p class="font-bold text-gray-800 flex items-center">${title} ${noteDisplay}</p><p class="text-xs font-semibold text-gray-500 mt-1">${formatDate(t.date)} &bull; ${walletName}</p></div></div>
@@ -1090,10 +1055,9 @@
     }
 
     function initCharts() {
-      if(!state) return; // Tolak jika tidak ada state
-      
+      if(!state) return;
       const cashflowCtx = document.getElementById('cashflowChart');
-      if(cashflowCtx && cashflowCtx.offsetParent !== null) { // Pastikan elemen canvas tidak display:none
+      if(cashflowCtx && cashflowCtx.offsetParent !== null) {
          if(charts.cashflow) charts.cashflow.destroy();
          const labels = [], incomes = [], expenses = [];
          const d = new Date();
@@ -1107,8 +1071,8 @@
          }
          charts.cashflow = new Chart(cashflowCtx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Pemasukan', data: incomes, backgroundColor: '#10B981', borderRadius: 8, barPercentage: 0.6 }, { label: 'Pengeluaran', data: expenses, backgroundColor: '#EF4444', borderRadius: 8, barPercentage: 0.6 }] },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {usePointStyle: true, boxWidth: 8, padding: 20, font:{weight:'bold'}} } }, scales: { y: { beginAtZero: true, border: {display: false}, grid: {color: '#f3f4f6'}, ticks: {callback: (v) => formatMoney(v).replace(/\.00$/, ''), font:{weight:'bold'}} }, x: { grid: {display: false}, ticks:{font:{weight:'bold'}} } }, interaction: { mode: 'index', intersect: false } }
+            data: { labels: labels, datasets: [{ label: 'Pemasukan', data: incomes, backgroundColor: '#10B981', borderRadius: 8 }, { label: 'Pengeluaran', data: expenses, backgroundColor: '#EF4444', borderRadius: 8 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom'} }, scales: { y: { beginAtZero: true, border: {display: false}, grid: {color: '#f3f4f6'}, ticks:{callback: v => formatMoney(v).replace(/\.00$/, '')} }, x: { grid: {display: false} } }, interaction: { mode: 'index', intersect: false } }
          });
       }
 
@@ -1123,51 +1087,44 @@
          Object.keys(catTotals).sort((a,b) => catTotals[b] - catTotals[a]).forEach(cid => { const cat = getCategory(cid); labels.push(cat.name); data.push(catTotals[cid]); colors.push(cat.color); });
 
          if(data.length === 0) {
-            charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: ['Belum ada pengeluaran'], datasets: [{ data: [1], backgroundColor: ['#F3F4F6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false}, tooltip: {enabled: false} }, cutout: '75%' } });
+            charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: ['Kosong'], datasets: [{ data: [1], backgroundColor: ['#F3F4F6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false}, tooltip: {enabled: false} } } });
          } else {
-            charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 3, borderColor: '#ffffff', hoverOffset: 6 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'right', labels: {usePointStyle: true, boxWidth: 8, font: {size: 11, weight:'bold'}} }, tooltip: { callbacks: { label: function(context) { return ' ' + formatMoney(context.raw); } } } } } });
+            charts.category = new Chart(categoryCtx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderWidth: 3 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right'} } } });
          }
       }
     }
 
-    function saveSettings() { 
+    window.saveSettings = function() { 
+        if(!state) return;
         state.settings.currency = document.getElementById('setting-currency').value; 
         state.settings.appName = document.getElementById('builder-name').value;
         state.settings.themeColor = document.getElementById('builder-color').value;
-        saveData(); 
-        showToast("Preferensi berhasil disimpan!", "success"); 
-    }
+        saveData(); showToast("Preferensi berhasil disimpan ke Cloud!", "success"); 
+    };
     
-    function exportData() {
+    window.exportData = function() {
       if(!state) return;
-      const dataStr = JSON.stringify(state, null, 2); const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const linkElement = document.createElement('a'); linkElement.setAttribute('href', dataUri); linkElement.setAttribute('download', `Backup_${state.settings.appName}_${currentUser}_${new Date().toISOString().split('T')[0]}.json`); linkElement.click(); showToast("Backup data akun berhasil diunduh.", "success");
-    }
+      const dataStr = JSON.stringify(state, null, 2); 
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const linkElement = document.createElement('a'); 
+      linkElement.setAttribute('href', dataUri); 
+      linkElement.setAttribute('download', `FinPro_Backup_${currentUser}_${new Date().toISOString().split('T')[0]}.json`); 
+      linkElement.click(); 
+      showToast("Backup data lokal berhasil diunduh.", "success");
+    };
     
-    function importData(event) {
-      const file = event.target.files[0]; if(!file) return; const reader = new FileReader();
-      reader.onload = function(e) {
-        try { const imported = JSON.parse(e.target.result); showConfirm("Aksi ini akan menimpa seluruh data akun Anda saat ini. Lanjutkan?", () => { state = { ...defaultState, ...imported }; saveData(); showToast("Data berhasil dipulihkan!", "success"); renderApp(); }); } 
-        catch (err) { showToast("File backup tidak valid / rusak.", "warning"); } event.target.value = '';
-      }; reader.readAsText(file);
-    }
-    
-    function factoryReset() { 
-      showConfirm("PERINGATAN: Semua data untuk akun ini akan dihapus permanen. Lanjutkan?", () => { 
-        localStorage.removeItem(`finpro_data_${currentUser}`); 
-        state = structuredClone(defaultState); 
-        saveData(); 
-        showToast("Data akun berhasil di-reset ke kondisi awal."); 
-      }); 
-    }
-
     document.getElementById('filter-month').addEventListener('change', renderApp);
     document.getElementById('filter-month-tx').addEventListener('change', renderApp);
     document.getElementById('filter-type').addEventListener('change', renderApp);
 
-    // Initial load process
-    window.onload = () => { 
-      checkSession(); // Cek jika pernah login
+    window.onload = async () => { 
+      const savedUser = sessionStorage.getItem('finpro_active_user');
+      if (savedUser && firebaseConfig) {
+         try {
+           await authenticateEnvironment();
+           processLoginSuccess(savedUser);
+         } catch(e) { console.log("Gagal memuat sesi sebelumnya", e) }
+      }
     };
   </script>
 </body>

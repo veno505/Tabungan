@@ -77,7 +77,7 @@
   <!-- Sidebar (Desktop) -->
   <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10 relative">
     <div class="p-6 flex items-center gap-3 border-b border-gray-100">
-      <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
+      <img src="https://placehold.co/100x100/4F46E5/FFFFFF?text=FP" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
       <h1 class="text-xl font-bold text-gray-800 tracking-tight" id="sidebar-app-name">FinPro</h1>
     </div>
     
@@ -112,7 +112,7 @@
     <!-- Topbar (Mobile only) -->
     <header class="md:hidden bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10">
       <div class="flex items-center gap-2">
-        <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
+        <img src="https://placehold.co/100x100/4F46E5/FFFFFF?text=FP" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
         <h1 class="text-lg font-bold text-gray-800" id="mobile-app-name">FinPro</h1>
       </div>
       <button onclick="openModal('add-transaction')" class="dynamic-bg bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
@@ -328,7 +328,7 @@
   </main>
 
   <!-- MODALS OVERLAY -->
-  <div id="modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 modal-enter flex items-center justify-center p-4">
+  <div id="modal-overlay" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-50 modal-enter flex items-center justify-center p-4 hidden">
     
     <!-- MODAL: ADD TRANSACTION -->
     <div id="modal-add-transaction" class="bg-white rounded-3xl w-full max-w-md shadow-2xl hidden flex-col overflow-hidden max-h-[90vh]">
@@ -454,7 +454,7 @@
       <div class="p-6 relative z-10 flex flex-col items-center text-center mt-4">
         <!-- Ikon App Besar -->
         <div class="w-24 h-24 bg-white p-2 rounded-3xl shadow-xl border border-gray-100 mb-4 transform -translate-y-12 relative">
-          <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
+          <img src="https://placehold.co/200x200/4F46E5/FFFFFF?text=App" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
           <!-- Badge Centang -->
           <div class="absolute -bottom-2 -right-2 bg-success text-white w-8 h-8 rounded-full flex justify-center items-center border-4 border-white shadow-sm">
             <i class="ph ph-check-circle text-lg"></i>
@@ -505,16 +505,18 @@
     let currentManifestUrl = null;
     let deferredPrompt = null;
     
-    // Fungsi mengembalikan URL ikon custom aplikasi secara permanen
+    // Fungsi mengembalikan URL ikon custom berdasarkan warna tema
     function getGeneratedIconUrl(text, bgColorHex) {
-      return "https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg";
+      const hex = bgColorHex.replace('#', '');
+      const shortText = text.substring(0, 2).toUpperCase();
+      return `https://placehold.co/200x200/${hex}/FFFFFF?text=${shortText}`;
     }
 
-    // Fungsi Web App Builder untuk membangun PWA dinamis & WebAPK compliant
+    // Fungsi Web App Builder untuk membangun PWA dinamis
     function buildPWA(appName, themeColor) {
       const iconUrl = getGeneratedIconUrl(appName, themeColor);
       
-      // Update semua icon di UI (Berjaga-jaga jika ter-reset)
+      // Update semua icon di UI
       document.querySelectorAll('.app-logo-img').forEach(img => {
         img.src = iconUrl;
       });
@@ -522,28 +524,16 @@
       const manifestContent = {
         "name": appName,
         "short_name": appName,
-        // Start URL harus merujuk ke path saat ini agar WebAPK valid
         "start_url": window.location.pathname + window.location.search,
         "display": "standalone",
         "orientation": "portrait",
         "background_color": "#F3F4F6",
         "theme_color": themeColor,
         "description": "Aplikasi Manajemen Keuangan Cerdas",
-        // Prefer related applications false untuk memastikan ini WebAPK bukan mengarah ke Playstore eksternal
         "prefer_related_applications": false,
         "icons": [
-          {
-            "src": iconUrl,
-            "sizes": "192x192",
-            "type": "image/jpeg",
-            "purpose": "any maskable"
-          },
-          {
-            "src": iconUrl,
-            "sizes": "512x512",
-            "type": "image/jpeg",
-            "purpose": "any maskable"
-          }
+          { "src": iconUrl, "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+          { "src": iconUrl, "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
         ]
       };
       
@@ -586,29 +576,27 @@
        const themeColor = document.getElementById('builder-color').value || "#4F46E5";
        
        buildPWA(appName, themeColor);
-       saveSettings(); // Simpan juga ke state storage
+       saveSettings(); 
        
        showToast("Identitas Web App berhasil diterapkan! Siap diinstal.", "success");
     });
 
     // Registrasi Service Worker untuk syarat mutlak PWA Android
     if ('serviceWorker' in navigator) {
-      // Menggunakan fetch event sederhana agar browser mendeteksi kapabilitas offline
       const swCode = `
-        const CACHE_NAME = 'finpro-webapk-v3';
+        const CACHE_NAME = 'finpro-webapk-v4';
         self.addEventListener('install', (e) => self.skipWaiting());
         self.addEventListener('activate', (e) => self.clients.claim());
         self.addEventListener('fetch', (e) => {
           e.respondWith(
-            fetch(e.request).catch(() => new Response('Aplikasi sedang berjalan dalam mode Offline.', { status: 200, headers: {'Content-Type':'text/plain'} }))
+            fetch(e.request).catch(() => new Response('Aplikasi berjalan dalam mode Offline.', { status: 200, headers: {'Content-Type':'text/plain'} }))
           );
         });
       `;
       const blobSW = new Blob([swCode], {type: 'application/javascript'});
       const swUrl = URL.createObjectURL(blobSW);
-      // Registrasi tanpa menyertakan spesifik scope memastikan default direktori file HTML
       navigator.serviceWorker.register(swUrl).then(reg => {
-        console.log('Service Worker Registered - PWA Ready');
+        console.log('Service Worker Registered');
       }).catch(err => console.log('SW Reg Failed', err));
     }
 
@@ -618,17 +606,15 @@
     const btnConfirmInstall = document.getElementById('pwa-btn-confirm-install');
     const btnCancelInstall = document.getElementById('pwa-btn-cancel');
 
-    // Mencegah prompt instalasi otomatis Chrome
+    // Menangkap event instalasi native
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      console.log('beforeinstallprompt tertangkap. Siap menginstal aplikasi.');
+      console.log('beforeinstallprompt tertangkap.');
     });
 
-    // Fungsi membuka Popup Modal Kustom
     function openInstallModal() {
       installModal.classList.remove('hidden');
-      // Trigger reflow & animation
       setTimeout(() => {
         installModal.classList.remove('opacity-0');
         installPanel.classList.remove('translate-y-full', 'md:translate-y-10');
@@ -642,47 +628,29 @@
       installModal.classList.add('opacity-0');
       setTimeout(() => {
         installModal.classList.add('hidden');
-      }, 300); // Waktu yang sama dengan durasi transisi Tailwind
+      }, 300);
     }
 
-    // Tombol di dalam halaman "Pengaturan" untuk memicu popup
-    btnTriggerModal.addEventListener('click', () => {
-      openInstallModal();
-    });
+    btnTriggerModal.addEventListener('click', openInstallModal);
 
-    // Tombol di dalam popup modal untuk benar-benar menginstal via Chrome
     btnConfirmInstall.addEventListener('click', async () => {
       if (deferredPrompt) {
         closeInstallModal();
-        // Menampilkan prompt native Android/Chrome
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if(outcome === 'accepted') {
-          showToast("Proses Instalasi WebAPK Dimulai...", "success");
-        } else {
-          showToast("Instalasi dibatalkan.", "warning");
+          showToast("Proses Instalasi Dimulai...", "success");
         }
         deferredPrompt = null;
       } else {
-        // Fallback jika tidak ada prompt (misal: iOS atau sudah terinstal)
         closeInstallModal();
-        showToast("Perangkat Anda tidak memicu prompt, atau aplikasi sudah terinstal. Jika di Chrome Android, cek menu titik tiga > Tambahkan ke Layar Utama.", "warning");
+        showToast("Browser tidak memicu instalasi otomatis (mungkin sudah terinstal). Cek menu browser Anda > 'Tambahkan ke Layar Utama'.", "warning");
       }
     });
 
     btnCancelInstall.addEventListener('click', closeInstallModal);
-    
-    // Tutup jika klik area background modal
-    installModal.addEventListener('click', (e) => {
-      if(e.target === installModal) closeInstallModal();
-    });
-
-    window.addEventListener('appinstalled', () => {
-      closeInstallModal();
-      showToast("🎉 Yey! Aplikasi berhasil diinstal di perangkat Anda.", "success");
-      deferredPrompt = null;
-    });
-
+    installModal.addEventListener('click', (e) => { if(e.target === installModal) closeInstallModal(); });
+    window.addEventListener('appinstalled', () => { closeInstallModal(); showToast("🎉 Aplikasi berhasil diinstal!", "success"); deferredPrompt = null; });
 
     const STORAGE_KEY = 'finpro_data_v3';
     
@@ -695,8 +663,8 @@
       { id: 'c6', name: 'Hiburan', type: 'expense', icon: 'film-strip', color: '#14B8A6' },
       { id: 'c7', name: 'Gaji', type: 'income', icon: 'money', color: '#10B981' },
       { id: 'c8', name: 'Investasi', type: 'income', icon: 'chart-line-up', color: '#0EA5E9' },
-      { id: 'c9', name: 'Pemasukan Lain', type: 'income', icon: 'plus-circle', color: '#6B7280' },
-      { id: 'c10', name: 'Pengeluaran Lain', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
+      { id: 'c9', name: 'Lainnya', type: 'income', icon: 'plus-circle', color: '#6B7280' },
+      { id: 'c10', name: 'Lainnya', type: 'expense', icon: 'minus-circle', color: '#6B7280' },
     ];
 
     const defaultState = {
@@ -817,7 +785,6 @@
       modalOverlay.classList.remove('hidden');
       targetModal.classList.remove('hidden');
       
-      // Delay for transition
       setTimeout(() => {
          modalOverlay.classList.add('modal-enter-active');
          targetModal.classList.add('modal-enter-active');
@@ -843,9 +810,8 @@
           document.querySelectorAll('[id^="modal-add-"], [id^="modal-update-"]').forEach(el => { 
              el.classList.add('hidden');
           });
-      }, 300); // Wait for transition
+      }, 300);
     }
-    document.getElementById('modal-overlay').addEventListener('click', (e) => { if(e.target.id === 'modal-overlay') closeModals(); });
 
     function setTxType(type) {
       document.getElementById('tx-type').value = type;
@@ -907,7 +873,7 @@
     });
 
     function deleteTransaction(id) {
-      showConfirm("Hapus transaksi ini? Saldo dompet akan disesuaikan kembali secara otomatis.", () => {
+      showConfirm("Hapus transaksi ini? Saldo dompet akan disesuaikan.", () => {
         const txIndex = state.transactions.findIndex(t => t.id === id); if(txIndex === -1) return;
         const tx = state.transactions[txIndex];
         if(tx.type === 'expense') { let w = state.wallets.find(w => w.id === tx.walletId); if(w) w.balance += tx.amount; }
@@ -941,7 +907,7 @@
     });
 
     function renderApp() {
-      // Setup Web App Builder berdasar state settings
+      // Inisiasi Builder UI
       document.getElementById('builder-name').value = state.settings.appName;
       document.getElementById('builder-color').value = state.settings.themeColor;
       buildPWA(state.settings.appName, state.settings.themeColor);
@@ -1091,6 +1057,7 @@
     document.getElementById('filter-month').addEventListener('change', renderApp);
     document.getElementById('filter-month-tx').addEventListener('change', renderApp);
     document.getElementById('filter-type').addEventListener('change', renderApp);
+    document.getElementById('modal-overlay').addEventListener('click', (e) => { if(e.target.id === 'modal-overlay') closeModals(); });
 
     window.onload = () => { renderApp(); setTimeout(initCharts, 200); };
   </script>

@@ -452,7 +452,7 @@
     const manifestContent = {
       "name": "FinPro App",
       "short_name": "FinPro",
-      "start_url": ".",
+      "start_url": window.location.href.split('?')[0], // Memastikan URL valid
       "display": "standalone",
       "background_color": "#F3F4F6",
       "theme_color": "#4F46E5",
@@ -461,12 +461,14 @@
         {
           "src": "https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg",
           "sizes": "192x192",
-          "type": "image/jpeg"
+          "type": "image/jpeg",
+          "purpose": "any maskable"
         },
         {
           "src": "https://cdn.phototourl.com/free/2026-07-31-a3b1d8a9-5cd9-4f35-b4a4-0dc5263efde8.jpg",
           "sizes": "512x512",
-          "type": "image/jpeg"
+          "type": "image/jpeg",
+          "purpose": "any maskable"
         }
       ]
     };
@@ -476,13 +478,15 @@
     document.querySelector('head').insertAdjacentHTML('beforeend', `<link rel="manifest" href="${manifestURL}">`);
 
     // 2. Dummy Service Worker for PWA compliance in one-file constraint
-    // In production, you would point this to a real sw.js file
     if ('serviceWorker' in navigator) {
       const swCode = `
         self.addEventListener('install', (e) => self.skipWaiting());
         self.addEventListener('activate', (e) => self.clients.claim());
         self.addEventListener('fetch', (e) => {
-          // Dummy fetch to make PWA installable
+          // Wajib memberikan respons Fetch agar Chrome menganggap PWA valid
+          e.respondWith(
+            fetch(e.request).catch(() => new Response('Offline mode active', { status: 200 }))
+          );
         });
       `;
       const blobSW = new Blob([swCode], {type: 'application/javascript'});
@@ -500,18 +504,16 @@
     const btnInstallSettings = document.getElementById('btn-install-settings');
 
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      // Mencegah Chrome menampilkan mini-infobar default
       e.preventDefault();
-      // Stash the event so it can be triggered later.
+      // Simpan event untuk dipicu nanti
       deferredPrompt = e;
       
-      // Update UI to notify the user they can add to home screen
-      // Wait a few seconds before showing so it doesn't block immediate usage
+      // Munculkan popup banner kustom setelah 1.5 detik
+      // (Pengecekan localStorage dihapus agar popup selalu tampil saat debugging)
       setTimeout(() => {
-        if (!localStorage.getItem('pwa_prompt_dismissed')) {
-          installBanner.classList.remove('hidden');
-        }
-      }, 3000);
+        installBanner.classList.remove('hidden');
+      }, 1500);
     });
 
     const triggerInstall = async () => {
@@ -522,16 +524,15 @@
         console.log(`User response to the install prompt: ${outcome}`);
         deferredPrompt = null;
       } else {
-        showToast("Aplikasi sudah diinstal atau browser tidak mendukung fitur instalasi.", "error");
+        showToast("Aplikasi mungkin sudah terinstal, atau cobalah buka dari Google Chrome.", "warning");
       }
     };
 
     btnInstall.addEventListener('click', triggerInstall);
-    btnInstallSettings.addEventListener('click', triggerInstall);
+    if(btnInstallSettings) btnInstallSettings.addEventListener('click', triggerInstall);
 
     btnDismiss.addEventListener('click', () => {
       installBanner.classList.add('hidden');
-      localStorage.setItem('pwa_prompt_dismissed', 'true');
     });
 
     window.addEventListener('appinstalled', () => {

@@ -421,127 +421,133 @@
     </details>
   </main>
 
-  <script>
-    const STORAGE_KEY = "uangku-simple-v1";
+ <script type="module">
+  // 1. Import Firebase SDK versi CDN
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-app.js";
+  import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore.js";
 
-    const defaultData = {
-      currency: "USD",
-      budget: 0,
-      initialDebt: 0,
-      transactions: [],
-      recurring: []
-    };
+  // 2. Konfigurasi Firebase milik Anda
+  const firebaseConfig = {
+    apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
+    authDomain: "keuangan-project-91d0a.firebaseapp.com",
+    projectId: "keuangan-project-91d0a",
+    storageBucket: "keuangan-project-91d0a.firebasestorage.app",
+    messagingSenderId: "412887443168",
+    appId: "1:412887443168:web:bb38eb69e2b677df805285",
+    measurementId: "G-95KQYRMYCC"
+  };
 
-    let data = loadData();
+  // 3. Inisialisasi Firebase & Firestore
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
 
-    function loadData() {
-      try {
-        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+  // Tempat penyimpanan di Cloud (Collection: uangku_data, Document: my_personal_wallet)
+  const DATABASE_REF = doc(db, "uangku_data", "my_personal_wallet");
 
-        return {
+  const defaultData = {
+    currency: "IDR",
+    budget: 0,
+    initialDebt: 0,
+    transactions: [],
+    recurring: []
+  };
+
+  let data = structuredClone(defaultData);
+
+  // 4. Tarik Data dari Firebase Cloud
+  async function loadData() {
+    try {
+      const docSnap = await getDoc(DATABASE_REF);
+      if (docSnap.exists()) {
+        const saved = docSnap.data();
+        data = {
           ...defaultData,
-          ...(saved || {}),
-          transactions: saved?.transactions || [],
-          recurring: saved?.recurring || []
+          ...saved,
+          transactions: saved.transactions || [],
+          recurring: saved.recurring || []
         };
-      } catch {
-        return structuredClone(defaultData);
       }
+      
+      syncRecurring();
+      renderAll();
+    } catch (error) {
+      console.error("Gagal menarik data dari Firebase:", error);
+      alert("Gagal memuat data dari Cloud.");
     }
+  }
 
-    function saveData(render = true) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-
-      if (render) {
-        renderAll();
-      }
+  // 5. Simpan Data ke Firebase Cloud
+  async function saveData(render = true) {
+    try {
+      await setDoc(DATABASE_REF, data);
+      if (render) renderAll();
+    } catch (error) {
+      console.error("Gagal menyimpan ke Firebase:", error);
+      alert("Gagal menyimpan data!");
     }
+  }
 
-    function createId() {
-      if (crypto.randomUUID) {
-        return crypto.randomUUID();
-      }
+  // ==========================================
+  // LOGIKA SISTEM KEUANGAN
+  // ==========================================
 
-      return Date.now() + "-" + Math.random();
+  function createId() {
+    return crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random();
+  }
+
+  function localDate() {
+    const date = new Date();
+    const offset = date.getTimezoneOffset() * 60000;
+    return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+  }
+
+  function currentMonth() {
+    return localDate().slice(0, 7);
+  }
+
+  function money(value) {
+    try {
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: data.currency,
+        maximumFractionDigits: data.currency === "IDR" ? 0 : 2
+      }).format(Number(value) || 0);
+    } catch {
+      return `${data.currency} ${Number(value || 0).toFixed(2)}`;
     }
+  }
 
-    function localDate() {
-      const date = new Date();
-      const offset = date.getTimezoneOffset() * 60000;
+  function safeText(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;");
+  }
 
-      return new Date(date.getTime() - offset)
-        .toISOString()
-        .slice(0, 10);
-    }
+  function typeName(type) {
+    const names = { income: "Uang masuk", expense: "Uang keluar", saving: "Dana aman", withdraw: "Ambil tabungan", debt: "Bayar utang" };
+    return names[type] || type;
+  }
 
-    function currentMonth() {
-      return localDate().slice(0, 7);
-    }
+  function typeColor(type) {
+    if (type === "income" || type === "withdraw") return "green";
+    if (type === "saving") return "purple";
+    return "red";
+  }
 
-    function money(value) {
-      try {
-        return new Intl.NumberFormat("en-US", {
-          style: "currency",
-          currency: data.currency,
-          maximumFractionDigits: data.currency === "IDR" ? 0 : 2
-        }).format(Number(value) || 0);
-      } catch {
-        return `${data.currency} ${Number(value || 0).toFixed(2)}`;
-      }
-    }
+  function syncRecurring() {
+    const month = currentMonth();
+    const [year, monthNumber] = month.split("-").map(Number);
+    const finalDay = new Date(year, monthNumber, 0).getDate();
+    let changed = false;
 
-    function safeText(value) {
-      return String(value)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
-    }
-
-    function typeName(type) {
-      const names = {
-        income: "Uang masuk",
-        expense: "Uang keluar",
-        saving: "Dana aman",
-        withdraw: "Ambil tabungan",
-        debt: "Bayar utang"
-      };
-
-      return names[type] || type;
-    }
-
-    function typeColor(type) {
-      if (type === "income" || type === "withdraw") {
-        return "green";
-      }
-
-      if (type === "saving") {
-        return "purple";
-      }
-
-      return "red";
-    }
-
-    function syncRecurring() {
-      const month = currentMonth();
-      const [year, monthNumber] = month.split("-").map(Number);
-      const finalDay = new Date(year, monthNumber, 0).getDate();
-
-      let changed = false;
-
-      data.recurring.forEach(item => {
-        const autoKey = `${item.id}-${month}`;
-
-        const alreadyExists = data.transactions.some(
-          transaction => transaction.autoKey === autoKey
-        );
-
-        if (alreadyExists) {
-          return;
-        }
-
+    data.recurring.forEach(item => {
+      const autoKey = `${item.id}-${month}`;
+      const alreadyExists = data.transactions.some(t => t.autoKey === autoKey);
+      
+      if (!alreadyExists) {
         const day = Math.min(Number(item.day), finalDay);
-
         data.transactions.push({
           id: createId(),
           date: `${month}-${String(day).padStart(2, "0")}`,
@@ -550,343 +556,174 @@
           amount: Number(item.amount),
           autoKey
         });
-
         changed = true;
-      });
-
-      if (changed) {
-        saveData(false);
       }
-    }
-
-    document
-      .getElementById("transactionForm")
-      .addEventListener("submit", event => {
-        event.preventDefault();
-
-        data.transactions.push({
-          id: createId(),
-          date: document.getElementById("date").value,
-          type: document.getElementById("type").value,
-          note: document.getElementById("note").value.trim(),
-          amount: Number(document.getElementById("amount").value)
-        });
-
-        event.target.reset();
-
-        document.getElementById("date").value = localDate();
-        document.getElementById("type").value = "expense";
-
-        saveData();
-      });
-
-    document
-      .getElementById("recurringForm")
-      .addEventListener("submit", event => {
-        event.preventDefault();
-
-        data.recurring.push({
-          id: createId(),
-          type: document.getElementById("recurringType").value,
-          note: document.getElementById("recurringNote").value.trim(),
-          amount: Number(
-            document.getElementById("recurringAmount").value
-          ),
-          day: Number(document.getElementById("recurringDay").value)
-        });
-
-        event.target.reset();
-
-        syncRecurring();
-        saveData();
-      });
-
-    document
-      .getElementById("settingsForm")
-      .addEventListener("submit", event => {
-        event.preventDefault();
-
-        data.budget = Number(
-          document.getElementById("budget").value
-        );
-
-        data.initialDebt = Number(
-          document.getElementById("initialDebt").value
-        );
-
-        data.currency =
-          document.getElementById("currency").value;
-
-        saveData();
-      });
-
-    document
-      .getElementById("month")
-      .addEventListener("change", renderAll);
-
-    document
-      .getElementById("importFile")
-      .addEventListener("change", event => {
-        const file = event.target.files[0];
-
-        if (!file) {
-          return;
-        }
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-          try {
-            const imported = JSON.parse(reader.result);
-
-            if (!confirm("Ganti data sekarang dengan data backup?")) {
-              return;
-            }
-
-            data = {
-              ...defaultData,
-              ...imported,
-              transactions: imported.transactions || [],
-              recurring: imported.recurring || []
-            };
-
-            syncRecurring();
-            saveData();
-
-            alert("Data berhasil dipulihkan.");
-          } catch {
-            alert("File backup tidak bisa dibaca.");
-          }
-
-          event.target.value = "";
-        };
-
-        reader.readAsText(file);
-      });
-
-    function removeTransaction(id) {
-      if (!confirm("Hapus catatan ini?")) {
-        return;
-      }
-
-      data.transactions = data.transactions.filter(
-        item => item.id !== id
-      );
-
-      saveData();
-    }
-
-    function removeRecurring(id) {
-      if (!confirm("Hapus transaksi rutin ini?")) {
-        return;
-      }
-
-      data.recurring = data.recurring.filter(
-        item => item.id !== id
-      );
-
-      saveData();
-    }
-
-    function renderAll() {
-      const month =
-        document.getElementById("month").value || currentMonth();
-
-      const monthTransactions = data.transactions.filter(
-        item => item.date.slice(0, 7) === month
-      );
-
-      const total = type =>
-        monthTransactions
-          .filter(item => item.type === type)
-          .reduce((sum, item) => sum + Number(item.amount), 0);
-
-      const income = total("income");
-      const expense = total("expense");
-      const savingThisMonth = total("saving");
-      const withdrawnThisMonth = total("withdraw");
-      const debtPaidThisMonth = total("debt");
-
-      const balance =
-        income +
-        withdrawnThisMonth -
-        expense -
-        savingThisMonth -
-        debtPaidThisMonth;
-
-      const totalSaving =
-        data.transactions
-          .filter(item => item.type === "saving")
-          .reduce((sum, item) => sum + Number(item.amount), 0) -
-        data.transactions
-          .filter(item => item.type === "withdraw")
-          .reduce((sum, item) => sum + Number(item.amount), 0);
-
-      const totalDebtPaid = data.transactions
-        .filter(item => item.type === "debt")
-        .reduce((sum, item) => sum + Number(item.amount), 0);
-
-      const remainingDebt = Math.max(
-        Number(data.initialDebt) - totalDebtPaid,
-        0
-      );
-
-      const budgetPercentage =
-        data.budget > 0
-          ? Math.round((expense / data.budget) * 100)
-          : 0;
-
-      document.getElementById("income").textContent =
-        money(income);
-
-      document.getElementById("expense").textContent =
-        money(expense);
-
-      document.getElementById("balance").textContent =
-        money(balance);
-
-      document.getElementById("saving").textContent =
-        money(Math.max(totalSaving, 0));
-
-      document.getElementById("debt").textContent =
-        money(remainingDebt);
-
-      document.getElementById("budgetUsed").textContent =
-        `${budgetPercentage}%`;
-
-      renderTransactions(monthTransactions);
-      renderRecurring();
-
-      document.getElementById("budget").value = data.budget;
-      document.getElementById("initialDebt").value =
-        data.initialDebt;
-      document.getElementById("currency").value = data.currency;
-    }
-
-    function renderTransactions(transactions) {
-      const container =
-        document.getElementById("transactionList");
-
-      const sorted = [...transactions].sort(
-        (a, b) => b.date.localeCompare(a.date)
-      );
-
-      if (!sorted.length) {
-        container.innerHTML =
-          '<div class="empty">Belum ada catatan.</div>';
-        return;
-      }
-
-      container.innerHTML = sorted
-        .map(item => `
-          <div class="item">
-            <div>
-              <div class="item-title">
-                ${safeText(item.note)}
-                ${item.autoKey ? '<span class="auto">OTOMATIS</span>' : ""}
-              </div>
-
-              <div class="item-info">
-                ${safeText(item.date)} · ${typeName(item.type)}
-              </div>
-            </div>
-
-            <div style="text-align: right;">
-              <strong class="${typeColor(item.type)}">
-                ${money(item.amount)}
-              </strong>
-
-              <div style="margin-top: 6px;">
-                <button
-                  class="danger small-button"
-                  onclick="removeTransaction('${item.id}')"
-                >
-                  Hapus
-                </button>
-              </div>
-            </div>
-          </div>
-        `)
-        .join("");
-    }
-
-    function renderRecurring() {
-      const container =
-        document.getElementById("recurringList");
-
-      if (!data.recurring.length) {
-        container.innerHTML =
-          '<div class="empty">Belum ada transaksi rutin.</div>';
-        return;
-      }
-
-      container.innerHTML = data.recurring
-        .map(item => `
-          <div class="item">
-            <div>
-              <div class="item-title">
-                ${safeText(item.note)}
-              </div>
-
-              <div class="item-info">
-                Setiap tanggal ${item.day}
-                · ${typeName(item.type)}
-                · ${money(item.amount)}
-              </div>
-            </div>
-
-            <button
-              class="danger small-button"
-              onclick="removeRecurring('${item.id}')"
-            >
-              Hapus
-            </button>
-          </div>
-        `)
-        .join("");
-    }
-
-    function backupData() {
-      const blob = new Blob(
-        [JSON.stringify(data, null, 2)],
-        { type: "application/json" }
-      );
-
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = `backup-uangku-${localDate()}.json`;
-      link.click();
-
-      URL.revokeObjectURL(url);
-    }
-
-    function deleteAllData() {
-      const answer = prompt(
-        'Ketik "HAPUS" untuk menghapus semua data.'
-      );
-
-      if (answer !== "HAPUS") {
-        return;
-      }
-
-      data = structuredClone(defaultData);
-      localStorage.removeItem(STORAGE_KEY);
-
-      saveData();
-    }
-
+    });
+
+    if (changed) saveData(false);
+  }
+
+  // --- EVENT LISTENERS ---
+  document.getElementById("transactionForm").addEventListener("submit", event => {
+    event.preventDefault();
+    data.transactions.push({
+      id: createId(),
+      date: document.getElementById("date").value,
+      type: document.getElementById("type").value,
+      note: document.getElementById("note").value.trim(),
+      amount: Number(document.getElementById("amount").value)
+    });
+    event.target.reset();
     document.getElementById("date").value = localDate();
-    document.getElementById("month").value = currentMonth();
+    document.getElementById("type").value = "expense";
+    saveData();
+  });
 
+  document.getElementById("recurringForm").addEventListener("submit", event => {
+    event.preventDefault();
+    data.recurring.push({
+      id: createId(),
+      type: document.getElementById("recurringType").value,
+      note: document.getElementById("recurringNote").value.trim(),
+      amount: Number(document.getElementById("recurringAmount").value),
+      day: Number(document.getElementById("recurringDay").value)
+    });
+    event.target.reset();
+    syncRecurring();
+    saveData();
+  });
+
+  document.getElementById("settingsForm").addEventListener("submit", event => {
+    event.preventDefault();
+    data.budget = Number(document.getElementById("budget").value);
+    data.initialDebt = Number(document.getElementById("initialDebt").value);
+    data.currency = document.getElementById("currency").value;
+    saveData();
+  });
+
+  document.getElementById("month").addEventListener("change", renderAll);
+
+  // --- FUNGSI GLOBAL ---
+  window.removeTransaction = function(id) {
+    if (!confirm("Hapus catatan ini?")) return;
+    data.transactions = data.transactions.filter(item => item.id !== id);
+    saveData();
+  };
+
+  window.removeRecurring = function(id) {
+    if (!confirm("Hapus transaksi rutin ini?")) return;
+    data.recurring = data.recurring.filter(item => item.id !== id);
+    saveData();
+  };
+
+  window.backupData = function() {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `backup-uangku-${localDate()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  window.deleteAllData = async function() {
+    const answer = prompt('Ketik "HAPUS" untuk menghapus semua data dari Cloud.');
+    if (answer !== "HAPUS") return;
+    
+    data = structuredClone(defaultData);
+    await saveData();
+    alert("Data berhasil dihapus dari Cloud.");
+  };
+
+  // --- RENDER UI ---
+  function renderAll() {
+    const month = document.getElementById("month").value || currentMonth();
+    const monthTransactions = data.transactions.filter(item => item.date.slice(0, 7) === month);
+
+    const total = type => monthTransactions.filter(item => item.type === type).reduce((sum, item) => sum + Number(item.amount), 0);
+
+    const income = total("income");
+    const expense = total("expense");
+    const savingThisMonth = total("saving");
+    const withdrawnThisMonth = total("withdraw");
+    const debtPaidThisMonth = total("debt");
+
+    const balance = income + withdrawnThisMonth - expense - savingThisMonth - debtPaidThisMonth;
+
+    const totalSaving = data.transactions.filter(item => item.type === "saving").reduce((sum, item) => sum + Number(item.amount), 0) -
+                        data.transactions.filter(item => item.type === "withdraw").reduce((sum, item) => sum + Number(item.amount), 0);
+
+    const totalDebtPaid = data.transactions.filter(item => item.type === "debt").reduce((sum, item) => sum + Number(item.amount), 0);
+    const remainingDebt = Math.max(Number(data.initialDebt) - totalDebtPaid, 0);
+    const budgetPercentage = data.budget > 0 ? Math.round((expense / data.budget) * 100) : 0;
+
+    document.getElementById("income").textContent = money(income);
+    document.getElementById("expense").textContent = money(expense);
+    document.getElementById("balance").textContent = money(balance);
+    document.getElementById("saving").textContent = money(Math.max(totalSaving, 0));
+    document.getElementById("debt").textContent = money(remainingDebt);
+    document.getElementById("budgetUsed").textContent = `${budgetPercentage}%`;
+
+    renderTransactions(monthTransactions);
+    renderRecurring();
+
+    document.getElementById("budget").value = data.budget || "";
+    document.getElementById("initialDebt").value = data.initialDebt || "";
+    document.getElementById("currency").value = data.currency;
+  }
+
+  function renderTransactions(transactions) {
+    const container = document.getElementById("transactionList");
+    const sorted = [...transactions].sort((a, b) => b.date.localeCompare(a.date));
+
+    if (!sorted.length) {
+      container.innerHTML = '<div class="empty">Belum ada catatan.</div>';
+      return;
+    }
+
+    container.innerHTML = sorted.map(item => `
+      <div class="item">
+        <div>
+          <div class="item-title">${safeText(item.note)} ${item.autoKey ? '<span class="auto">OTOMATIS</span>' : ""}</div>
+          <div class="item-info">${safeText(item.date)} · ${typeName(item.type)}</div>
+        </div>
+        <div style="text-align: right;">
+          <strong class="${typeColor(item.type)}">${money(item.amount)}</strong>
+          <div style="margin-top: 6px;">
+            <button class="danger small-button" onclick="window.removeTransaction('${item.id}')">Hapus</button>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderRecurring() {
+    const container = document.getElementById("recurringList");
+    if (!data.recurring.length) {
+      container.innerHTML = '<div class="empty">Belum ada transaksi rutin.</div>';
+      return;
+    }
+    container.innerHTML = data.recurring.map(item => `
+      <div class="item">
+        <div>
+          <div class="item-title">${safeText(item.note)}</div>
+          <div class="item-info">Setiap tanggal ${item.day} · ${typeName(item.type)} · ${money(item.amount)}</div>
+        </div>
+        <button class="danger small-button" onclick="window.removeRecurring('${item.id}')">Hapus</button>
+      </div>
+    `).join("");
+  }
+
+  // --- INIT ---
+  document.getElementById("date").value = localDate();
+  document.getElementById("month").value = currentMonth();
+  
+  loadData();
+
+  setInterval(() => {
     syncRecurring();
     renderAll();
-
-    setInterval(() => {
-      syncRecurring();
-      renderAll();
-    }, 60000);
-  </script>
+  }, 60000);
+</script>
 </body>
 </html>

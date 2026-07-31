@@ -61,6 +61,7 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+    /* Active Nav Item */
     .nav-item.active { background-color: #EEF2FF; color: var(--theme-color, #4F46E5); font-weight: 600; }
     .nav-item.active i { color: var(--theme-color, #4F46E5); }
     
@@ -76,7 +77,7 @@
   <!-- Sidebar (Desktop) -->
   <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10 relative">
     <div class="p-6 flex items-center gap-3 border-b border-gray-100">
-      <img src="https://placehold.co/100x100/4F46E5/ffffff?text=FP" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
+      <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm app-logo-img">
       <h1 class="text-xl font-bold text-gray-800 tracking-tight" id="sidebar-app-name">FinPro</h1>
     </div>
     
@@ -111,7 +112,7 @@
     <!-- Topbar (Mobile only) -->
     <header class="md:hidden bg-white px-4 py-3 flex justify-between items-center border-b border-gray-200 shadow-sm z-10">
       <div class="flex items-center gap-2">
-        <img src="https://placehold.co/100x100/4F46E5/ffffff?text=FP" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
+        <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="Logo" class="w-7 h-7 rounded object-cover shadow-sm app-logo-img">
         <h1 class="text-lg font-bold text-gray-800" id="mobile-app-name">FinPro</h1>
       </div>
       <button onclick="openModal('add-transaction')" class="dynamic-bg bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
@@ -453,7 +454,7 @@
       <div class="p-6 relative z-10 flex flex-col items-center text-center mt-4">
         <!-- Ikon App Besar -->
         <div class="w-24 h-24 bg-white p-2 rounded-3xl shadow-xl border border-gray-100 mb-4 transform -translate-y-12 relative">
-          <img src="https://placehold.co/512x512/4F46E5/ffffff?text=FP" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
+          <img src="https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg" alt="App Icon" class="w-full h-full rounded-2xl object-cover app-logo-img">
           <!-- Badge Centang -->
           <div class="absolute -bottom-2 -right-2 bg-success text-white w-8 h-8 rounded-full flex justify-center items-center border-4 border-white shadow-sm">
             <i class="ph ph-check-circle text-lg"></i>
@@ -504,17 +505,16 @@
     let currentManifestUrl = null;
     let deferredPrompt = null;
     
-    // Fungsi membuat gambar placeholder dinamis berdasarkan warna dan teks
+    // Fungsi mengembalikan URL ikon custom aplikasi secara permanen
     function getGeneratedIconUrl(text, bgColorHex) {
-      const color = bgColorHex.replace('#', '');
-      return `https://placehold.co/512x512/${color}/ffffff?text=${text.substring(0,2).toUpperCase()}`;
+      return "https://cdn.phototourl.com/free/2026-07-31-3b6d76be-4503-4fb7-864e-9a49bb455580.jpg";
     }
 
     // Fungsi Web App Builder untuk membangun PWA dinamis & WebAPK compliant
     function buildPWA(appName, themeColor) {
       const iconUrl = getGeneratedIconUrl(appName, themeColor);
       
-      // Update semua icon di UI
+      // Update semua icon di UI (Berjaga-jaga jika ter-reset)
       document.querySelectorAll('.app-logo-img').forEach(img => {
         img.src = iconUrl;
       });
@@ -535,13 +535,13 @@
           {
             "src": iconUrl,
             "sizes": "192x192",
-            "type": "image/png",
+            "type": "image/jpeg",
             "purpose": "any maskable"
           },
           {
             "src": iconUrl,
             "sizes": "512x512",
-            "type": "image/png",
+            "type": "image/jpeg",
             "purpose": "any maskable"
           }
         ]
@@ -595,7 +595,7 @@
     if ('serviceWorker' in navigator) {
       // Menggunakan fetch event sederhana agar browser mendeteksi kapabilitas offline
       const swCode = `
-        const CACHE_NAME = 'finpro-webapk-v2';
+        const CACHE_NAME = 'finpro-webapk-v3';
         self.addEventListener('install', (e) => self.skipWaiting());
         self.addEventListener('activate', (e) => self.clients.claim());
         self.addEventListener('fetch', (e) => {
@@ -684,7 +684,6 @@
     });
 
 
-    /* ================= STREAMING_CHUNK:Manajemen Data & State Aplikasi... ================= */
     const STORAGE_KEY = 'finpro_data_v3';
     
     const defaultCategories = [
@@ -737,7 +736,6 @@
 
     function generateId() { return Date.now().toString(36) + Math.random().toString(36).substr(2); }
 
-    /* ================= STREAMING_CHUNK:Navigasi dan Fungsi Pendukung... ================= */
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -812,7 +810,6 @@
       if(tabId === 'dashboard') initCharts();
     }
 
-    /* ================= STREAMING_CHUNK:Logika Form Modal (DOM & Data)... ================= */
     function openModal(modalId) {
       const modalOverlay = document.getElementById('modal-overlay');
       const targetModal = document.getElementById(`modal-${modalId}`);
@@ -943,7 +940,6 @@
       let goal = state.goals.find(g => g.id === id); if(goal && amount > 0) { goal.saved += amount; saveData(); closeModals(); showToast("Tabungan ditambahkan!"); }
     });
 
-    /* ================= STREAMING_CHUNK:Sistem Rendering & Inisialisasi UI... ================= */
     function renderApp() {
       // Setup Web App Builder berdasar state settings
       document.getElementById('builder-name').value = state.settings.appName;
@@ -1030,7 +1026,6 @@
       container.innerHTML = html;
     }
 
-    /* ================= STREAMING_CHUNK:Chart.js Visualization & Lainnya... ================= */
     function initCharts() {
       const cashflowCtx = document.getElementById('cashflowChart');
       if(cashflowCtx) {

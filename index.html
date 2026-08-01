@@ -538,33 +538,27 @@
   <!-- INTEGRATED JAVASCRIPT WITH FIREBASE (type="module") -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Konfigurasi Firebase (Mendukung sistem sandbox & hosting milik sendiri)
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'finpro-app-id';
-    let firebaseConfig;
-    if (typeof __firebase_config !== 'undefined') {
-        firebaseConfig = JSON.parse(__firebase_config);
-    } else {
-        firebaseConfig = {
-          apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
-          authDomain: "keuangan-project-91d0a.firebaseapp.com",
-          projectId: "keuangan-project-91d0a",
-          storageBucket: "keuangan-project-91d0a.firebasestorage.app",
-          messagingSenderId: "412887443168",
-          appId: "1:412887443168:web:bb38eb69e2b677df805285",
-          measurementId: "G-95KQYRMYCC"
-        };
-    }
+    // Konfigurasi Firebase milik Anda
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
+      authDomain: "keuangan-project-91d0a.firebaseapp.com",
+      projectId: "keuangan-project-91d0a",
+      storageBucket: "keuangan-project-91d0a.firebasestorage.app",
+      messagingSenderId: "412887443168",
+      appId: "1:412887443168:web:bb38eb69e2b677df805285",
+      measurementId: "G-95KQYRMYCC"
+    };
 
-    // Inisialisasi Firebase, Auth, & Firestore
+    // Inisialisasi Firebase & Firestore
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
 
-    let DATABASE_REF = null; // Akan diset setelah autentikasi berhasil
-    const STORAGE_KEY = 'finpro_data_backup';
+    // Document Reference: uangku_data / my_personal_wallet
+    const DATABASE_REF = doc(db, "uangku_data", "my_personal_wallet");
+
+    const STORAGE_KEY = 'finpro_data_backup'; // Backup lokal
 
     // Default categories
     const defaultCategories = [
@@ -594,47 +588,9 @@
     let state = structuredClone(defaultState);
     let charts = { cashflow: null, category: null };
 
-    // FUNGSI INISIALISASI AUTENTIKASI (WAJIB AGAR TIDAK ERROR PERMISSION)
-    async function initApp() {
-      try {
-        if (typeof __initial_auth_token !== 'undefined') {
-            await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-            await signInAnonymously(auth);
-        }
-
-        const user = auth.currentUser;
-        if (!user) throw new Error("Gagal mengautentikasi user");
-
-        // Menentukan rute referensi dokumen berdasarkan lingkungan
-        if (typeof __app_id !== 'undefined') {
-            // PERBAIKAN: Menggunakan 4 segmen agar genap (collection, doc, collection, doc)
-            DATABASE_REF = doc(db, 'artifacts', appId, 'users', user.uid);
-        } else {
-            DATABASE_REF = doc(db, "uangku_data", "my_personal_wallet");
-        }
-
-        await loadData();
-      } catch (error) {
-        console.error("Auth / Load Error:", error);
-        showToast("Mode Offline: Menggunakan data lokal.", "warning");
-        fallbackLocalData();
-      }
-    }
-
-    function fallbackLocalData() {
-        const localData = localStorage.getItem(STORAGE_KEY);
-        if(localData) {
-            state = { ...defaultState, ...JSON.parse(localData) };
-        }
-        renderApp();
-        setTimeout(initCharts, 200);
-    }
-
     // Fungsi Menarik Data dari Firebase
     async function loadData() {
       try {
-        if (!DATABASE_REF) return fallbackLocalData();
         showToast("Menyinkronkan data dari Cloud...", "info");
         const docSnap = await getDoc(DATABASE_REF);
         
@@ -649,14 +605,21 @@
             goals: saved.goals || []
           };
           
+          // Simpan ke local storage sebagai backup saat offline
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } else {
+          // Jika document tidak ada, buat dengan default data
           await setDoc(DATABASE_REF, state);
         }
       } catch (error) {
         console.error("Gagal menarik data dari Firebase:", error);
-        fallbackLocalData();
-        return;
+        showToast("Mode Offline: Menggunakan data lokal.", "warning");
+        
+        // Fallback Local Storage
+        const localData = localStorage.getItem(STORAGE_KEY);
+        if(localData) {
+            state = { ...defaultState, ...JSON.parse(localData) };
+        }
       }
       
       renderApp();
@@ -665,13 +628,14 @@
 
     // Fungsi Menyimpan Data ke Firebase
     async function saveData() {
+      // Langsung render UI agar responsif, tidak perlu menunggu cloud
       renderApp(); 
       
       try {
+        // Backup ke lokal dulu agar aman
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        if(DATABASE_REF && auth.currentUser) {
-            await setDoc(DATABASE_REF, state);
-        }
+        // Simpan ke cloud
+        await setDoc(DATABASE_REF, state);
       } catch (error) {
         console.error("Gagal menyimpan ke Firebase:", error);
         showToast("Gagal menyinkronkan ke Cloud. Tersimpan secara lokal.", "error");
@@ -1013,11 +977,11 @@
                  toWallet.balance += amount;
              }
 
-             // 3. Update objek transaksi (bersihkan object terdahulu)
+             // 3. Update objek transaksi
              state.transactions[oldTxIndex] = {
-                id: oldTx.id, timestamp: oldTx.timestamp,
+                ...oldTx,
                 type, amount, date, note, walletId, 
-                ...(type === 'transfer' ? { toWalletId, categoryId: null } : { categoryId, toWalletId: null })
+                ...(type === 'transfer' ? { toWalletId } : { categoryId })
              };
          }
       } else {
@@ -1427,7 +1391,7 @@
       showConfirm("PERINGATAN: Semua data akan dihapus permanen dari Perangkat & Cloud. Lanjutkan?", async () => {
          state = structuredClone(defaultState);
          try {
-            if (DATABASE_REF) await setDoc(DATABASE_REF, state);
+            await setDoc(DATABASE_REF, state);
             localStorage.removeItem(STORAGE_KEY);
             renderApp();
             showToast("Semua data berhasil di-reset.");
@@ -1442,7 +1406,7 @@
     document.getElementById('filter-type').addEventListener('change', renderApp);
 
     // Initial Load execution
-    initApp();
+    loadData();
 
   </script>
 </body>

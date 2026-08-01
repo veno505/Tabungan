@@ -389,6 +389,7 @@
         </div>
 
         <form id="form-transaction" class="space-y-4">
+          <input type="hidden" id="tx-id" value="">
           <input type="hidden" id="tx-type" value="expense">
           
           <div>
@@ -449,6 +450,7 @@
       </div>
       <div class="p-5">
         <form id="form-wallet" class="space-y-4">
+          <input type="hidden" id="wallet-id" value="">
           <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nama Dompet</label>
             <input type="text" id="wallet-name" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="BCA / Tunai / Gopay">
@@ -474,6 +476,7 @@
       </div>
       <div class="p-5">
         <form id="form-goal" class="space-y-4">
+          <input type="hidden" id="goal-id" value="">
           <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Nama Target</label>
             <input type="text" id="goal-name" required class="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary outline-none" placeholder="Beli Laptop / Dana Darurat">
@@ -535,27 +538,33 @@
   <!-- INTEGRATED JAVASCRIPT WITH FIREBASE (type="module") -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // Konfigurasi Firebase milik Anda
-    const firebaseConfig = {
-      apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
-      authDomain: "keuangan-project-91d0a.firebaseapp.com",
-      projectId: "keuangan-project-91d0a",
-      storageBucket: "keuangan-project-91d0a.firebasestorage.app",
-      messagingSenderId: "412887443168",
-      appId: "1:412887443168:web:bb38eb69e2b677df805285",
-      measurementId: "G-95KQYRMYCC"
-    };
+    // Konfigurasi Firebase (Mendukung sistem sandbox & hosting milik sendiri)
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'finpro-app-id';
+    let firebaseConfig;
+    if (typeof __firebase_config !== 'undefined') {
+        firebaseConfig = JSON.parse(__firebase_config);
+    } else {
+        firebaseConfig = {
+          apiKey: "AIzaSyBRqtDo6I0JRBxV-2Cr4D0W8xRr0rDYXpI",
+          authDomain: "keuangan-project-91d0a.firebaseapp.com",
+          projectId: "keuangan-project-91d0a",
+          storageBucket: "keuangan-project-91d0a.firebasestorage.app",
+          messagingSenderId: "412887443168",
+          appId: "1:412887443168:web:bb38eb69e2b677df805285",
+          measurementId: "G-95KQYRMYCC"
+        };
+    }
 
-    // Inisialisasi Firebase & Firestore
+    // Inisialisasi Firebase, Auth, & Firestore
     const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Document Reference: uangku_data / my_personal_wallet
-    const DATABASE_REF = doc(db, "uangku_data", "my_personal_wallet");
-
-    const STORAGE_KEY = 'finpro_data_backup'; // Backup lokal
+    let DATABASE_REF = null; // Akan diset setelah autentikasi berhasil
+    const STORAGE_KEY = 'finpro_data_backup';
 
     // Default categories
     const defaultCategories = [
@@ -585,9 +594,47 @@
     let state = structuredClone(defaultState);
     let charts = { cashflow: null, category: null };
 
+    // FUNGSI INISIALISASI AUTENTIKASI (WAJIB AGAR TIDAK ERROR PERMISSION)
+    async function initApp() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined') {
+            await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+            await signInAnonymously(auth);
+        }
+
+        const user = auth.currentUser;
+        if (!user) throw new Error("Gagal mengautentikasi user");
+
+        // Menentukan rute referensi dokumen berdasarkan lingkungan
+        if (typeof __app_id !== 'undefined') {
+            // PERBAIKAN: Menggunakan 4 segmen agar genap (collection, doc, collection, doc)
+            DATABASE_REF = doc(db, 'artifacts', appId, 'users', user.uid);
+        } else {
+            DATABASE_REF = doc(db, "uangku_data", "my_personal_wallet");
+        }
+
+        await loadData();
+      } catch (error) {
+        console.error("Auth / Load Error:", error);
+        showToast("Mode Offline: Menggunakan data lokal.", "warning");
+        fallbackLocalData();
+      }
+    }
+
+    function fallbackLocalData() {
+        const localData = localStorage.getItem(STORAGE_KEY);
+        if(localData) {
+            state = { ...defaultState, ...JSON.parse(localData) };
+        }
+        renderApp();
+        setTimeout(initCharts, 200);
+    }
+
     // Fungsi Menarik Data dari Firebase
     async function loadData() {
       try {
+        if (!DATABASE_REF) return fallbackLocalData();
         showToast("Menyinkronkan data dari Cloud...", "info");
         const docSnap = await getDoc(DATABASE_REF);
         
@@ -602,21 +649,14 @@
             goals: saved.goals || []
           };
           
-          // Simpan ke local storage sebagai backup saat offline
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } else {
-          // Jika document tidak ada, buat dengan default data
           await setDoc(DATABASE_REF, state);
         }
       } catch (error) {
         console.error("Gagal menarik data dari Firebase:", error);
-        showToast("Mode Offline: Menggunakan data lokal.", "warning");
-        
-        // Fallback Local Storage
-        const localData = localStorage.getItem(STORAGE_KEY);
-        if(localData) {
-            state = { ...defaultState, ...JSON.parse(localData) };
-        }
+        fallbackLocalData();
+        return;
       }
       
       renderApp();
@@ -625,14 +665,13 @@
 
     // Fungsi Menyimpan Data ke Firebase
     async function saveData() {
-      // Langsung render UI agar responsif, tidak perlu menunggu cloud
       renderApp(); 
       
       try {
-        // Backup ke lokal dulu agar aman
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        // Simpan ke cloud
-        await setDoc(DATABASE_REF, state);
+        if(DATABASE_REF && auth.currentUser) {
+            await setDoc(DATABASE_REF, state);
+        }
       } catch (error) {
         console.error("Gagal menyimpan ke Firebase:", error);
         showToast("Gagal menyinkronkan ke Cloud. Tersimpan secara lokal.", "error");
@@ -757,10 +796,22 @@
       document.getElementById(`modal-${modalId}`).classList.add('modal-enter-active');
       
       if(modalId === 'add-transaction') {
+        document.querySelector('#modal-add-transaction h3').innerText = "Catat Transaksi";
+        document.getElementById('tx-id').value = '';
         document.getElementById('tx-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('tx-amount').value = '';
+        document.getElementById('tx-note').value = '';
         window.setTxType('expense');
         populateSelects();
         document.getElementById('tx-currency-symbol').innerText = state.settings.currency === 'IDR' ? 'Rp' : (state.settings.currency === 'USD' ? '$' : '€');
+      } else if (modalId === 'add-wallet') {
+        document.querySelector('#modal-add-wallet h3').innerText = "Tambah Dompet";
+        document.getElementById('wallet-id').value = '';
+        document.getElementById('form-wallet').reset();
+      } else if (modalId === 'add-goal') {
+        document.querySelector('#modal-add-goal h3').innerText = "Buat Target";
+        document.getElementById('goal-id').value = '';
+        document.getElementById('form-goal').reset();
       }
     }
 
@@ -845,9 +896,70 @@
       }
     }
 
+    // FUNGSI EDIT DATA
+    window.editTransaction = function(id) {
+      const tx = state.transactions.find(t => t.id === id);
+      if(!tx) return;
+      
+      document.getElementById('tx-id').value = tx.id;
+      document.getElementById('tx-date').value = tx.date;
+      document.getElementById('tx-amount').value = tx.amount;
+      document.getElementById('tx-note').value = tx.note || '';
+      
+      window.setTxType(tx.type); 
+      
+      setTimeout(() => {
+          if(tx.type === 'transfer') {
+              document.getElementById('tx-wallet').value = tx.walletId;
+              document.getElementById('tx-wallet-to').value = tx.toWalletId;
+          } else {
+              document.getElementById('tx-wallet').value = tx.walletId;
+              document.getElementById('tx-category').value = tx.categoryId;
+          }
+      }, 50);
+
+      document.querySelector('#modal-add-transaction h3').innerText = "Edit Transaksi";
+      
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      document.getElementById(`modal-add-transaction`).classList.remove('hidden');
+      document.getElementById(`modal-add-transaction`).classList.add('modal-enter-active');
+    }
+
+    window.editWallet = function(id) {
+      const w = state.wallets.find(w => w.id === id);
+      if(!w) return;
+      
+      document.getElementById('wallet-id').value = w.id;
+      document.getElementById('wallet-name').value = w.name;
+      document.getElementById('wallet-balance').value = w.balance;
+      document.getElementById('wallet-color').value = w.color;
+
+      document.querySelector('#modal-add-wallet h3').innerText = "Edit Dompet";
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      document.getElementById(`modal-add-wallet`).classList.remove('hidden');
+      document.getElementById(`modal-add-wallet`).classList.add('modal-enter-active');
+    }
+
+    window.editGoal = function(id) {
+      const g = state.goals.find(g => g.id === id);
+      if(!g) return;
+      
+      document.getElementById('goal-id').value = g.id;
+      document.getElementById('goal-name').value = g.name;
+      document.getElementById('goal-target').value = g.target;
+      document.getElementById('goal-saved').value = g.saved;
+      document.getElementById('goal-deadline').value = g.deadline || '';
+
+      document.querySelector('#modal-add-goal h3').innerText = "Edit Target";
+      document.getElementById('modal-overlay').classList.remove('hidden');
+      document.getElementById(`modal-add-goal`).classList.remove('hidden');
+      document.getElementById(`modal-add-goal`).classList.add('modal-enter-active');
+    }
+
     document.getElementById('form-transaction').addEventListener('submit', (e) => {
       e.preventDefault();
       
+      const id = document.getElementById('tx-id').value;
       const type = document.getElementById('tx-type').value;
       const amount = parseFloat(document.getElementById('tx-amount').value);
       const date = document.getElementById('tx-date').value;
@@ -860,35 +972,73 @@
         return;
       }
 
+      let toWalletId = null;
+      let toWallet = null;
       if (type === 'transfer') {
-        const toWalletId = document.getElementById('tx-wallet-to').value;
+        toWalletId = document.getElementById('tx-wallet-to').value;
         if(walletId === toWalletId) {
           showToast("Dompet asal dan tujuan tidak boleh sama", "error");
           return;
         }
-        
-        let toWallet = state.wallets.find(w => w.id === toWalletId);
-        wallet.balance -= amount;
-        toWallet.balance += amount;
+        toWallet = state.wallets.find(w => w.id === toWalletId);
+      }
+      
+      const categoryId = type !== 'transfer' ? document.getElementById('tx-category').value : null;
 
-        state.transactions.push({
-          id: generateId(), type: 'transfer', amount, date, walletId, toWalletId,
-          note: note || `Transfer ke ${toWallet.name}`, timestamp: Date.now()
-        });
+      if (id) {
+         // LOGIKA EDIT TRANSAKSI
+         const oldTxIndex = state.transactions.findIndex(t => t.id === id);
+         if(oldTxIndex > -1) {
+             const oldTx = state.transactions[oldTxIndex];
+             
+             // 1. Kembalikan efek transaksi lama ke saldo
+             if(oldTx.type === 'expense') {
+               let w = state.wallets.find(w => w.id === oldTx.walletId);
+               if(w) w.balance += oldTx.amount;
+             } else if (oldTx.type === 'income') {
+               let w = state.wallets.find(w => w.id === oldTx.walletId);
+               if(w) w.balance -= oldTx.amount;
+             } else if (oldTx.type === 'transfer') {
+               let wFrom = state.wallets.find(w => w.id === oldTx.walletId);
+               let wTo = state.wallets.find(w => w.id === oldTx.toWalletId);
+               if(wFrom) wFrom.balance += oldTx.amount;
+               if(wTo) wTo.balance -= oldTx.amount;
+             }
+
+             // 2. Terapkan efek transaksi baru ke saldo
+             if(type === 'expense') wallet.balance -= amount;
+             if(type === 'income') wallet.balance += amount;
+             if(type === 'transfer') {
+                 wallet.balance -= amount;
+                 toWallet.balance += amount;
+             }
+
+             // 3. Update objek transaksi (bersihkan object terdahulu)
+             state.transactions[oldTxIndex] = {
+                id: oldTx.id, timestamp: oldTx.timestamp,
+                type, amount, date, note, walletId, 
+                ...(type === 'transfer' ? { toWalletId, categoryId: null } : { categoryId, toWalletId: null })
+             };
+         }
       } else {
-        const categoryId = document.getElementById('tx-category').value;
-        if (type === 'expense') wallet.balance -= amount;
-        if (type === 'income') wallet.balance += amount;
+         // LOGIKA TRANSAKSI BARU
+         if (type === 'expense') wallet.balance -= amount;
+         if (type === 'income') wallet.balance += amount;
+         if (type === 'transfer') {
+             wallet.balance -= amount;
+             toWallet.balance += amount;
+         }
 
-        state.transactions.push({
-          id: generateId(), type, amount, date, categoryId, walletId, note, timestamp: Date.now()
-        });
+         state.transactions.push({
+            id: generateId(), type, amount, date, walletId, note, timestamp: Date.now(),
+            ...(type === 'transfer' ? { toWalletId } : { categoryId })
+         });
       }
 
       e.target.reset();
       window.closeModals();
       saveData();
-      showToast("Transaksi tersimpan di Cloud!");
+      showToast(id ? "Transaksi berhasil diperbarui!" : "Transaksi tersimpan di Cloud!");
     });
 
     window.deleteTransaction = function(id) {
@@ -919,16 +1069,24 @@
 
     document.getElementById('form-wallet').addEventListener('submit', (e) => {
       e.preventDefault();
+      const id = document.getElementById('wallet-id').value;
       const name = document.getElementById('wallet-name').value.trim();
       const balance = parseFloat(document.getElementById('wallet-balance').value);
       const color = document.getElementById('wallet-color').value;
 
-      state.wallets.push({ id: generateId(), name, balance, color });
+      if (id) {
+         // Update Dompet
+         const w = state.wallets.find(w => w.id === id);
+         if(w) { w.name = name; w.balance = balance; w.color = color; }
+      } else {
+         // Buat Dompet
+         state.wallets.push({ id: generateId(), name, balance, color });
+      }
 
       e.target.reset();
       window.closeModals();
       saveData();
-      showToast("Dompet ditambahkan!");
+      showToast(id ? "Dompet diperbarui!" : "Dompet ditambahkan!");
     });
     
     window.deleteWallet = function(id) {
@@ -945,17 +1103,25 @@
 
     document.getElementById('form-goal').addEventListener('submit', (e) => {
       e.preventDefault();
+      const id = document.getElementById('goal-id').value;
       const name = document.getElementById('goal-name').value.trim();
       const target = parseFloat(document.getElementById('goal-target').value);
       const saved = parseFloat(document.getElementById('goal-saved').value) || 0;
       const deadline = document.getElementById('goal-deadline').value;
 
-      state.goals.push({ id: generateId(), name, target, saved, deadline });
+      if (id) {
+         // Update Target
+         const g = state.goals.find(g => g.id === id);
+         if(g) { g.name = name; g.target = target; g.saved = saved; g.deadline = deadline; }
+      } else {
+         // Buat Target
+         state.goals.push({ id: generateId(), name, target, saved, deadline });
+      }
 
       e.target.reset();
       window.closeModals();
       saveData();
-      showToast("Target tabungan dibuat!");
+      showToast(id ? "Target diperbarui!" : "Target tabungan dibuat!");
     });
 
     window.deleteGoal = function(id) {
@@ -1028,9 +1194,14 @@
                  <h3 class="text-lg font-bold text-gray-800">${w.name}</h3>
                  <p class="text-2xl font-bold text-gray-900 mt-2">${formatMoney(w.balance)}</p>
                </div>
-               <button onclick="deleteWallet('${w.id}')" title="Hapus Dompet" class="text-gray-300 hover:text-danger hover:bg-red-50 p-2 rounded-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
-                 <i class="ph ph-trash text-xl"></i>
-               </button>
+               <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                 <button onclick="editWallet('${w.id}')" title="Edit Dompet" class="text-gray-400 hover:text-primary hover:bg-indigo-50 p-2 rounded-lg transition-all">
+                   <i class="ph ph-pencil-simple text-xl"></i>
+                 </button>
+                 <button onclick="deleteWallet('${w.id}')" title="Hapus Dompet" class="text-gray-400 hover:text-danger hover:bg-red-50 p-2 rounded-lg transition-all">
+                   <i class="ph ph-trash text-xl"></i>
+                 </button>
+               </div>
             </div>
           </div>
         `;
@@ -1054,6 +1225,7 @@
               </div>
               <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
                 ${!isComplete ? `<button onclick="openUpdateGoal('${g.id}')" title="Tambah Tabungan" class="text-gray-400 hover:text-success hover:bg-emerald-50 bg-white rounded-lg p-1.5 transition-colors"><i class="ph ph-plus text-lg"></i></button>` : ''}
+                <button onclick="editGoal('${g.id}')" title="Edit Target" class="text-gray-400 hover:text-primary hover:bg-indigo-50 bg-white rounded-lg p-1.5 transition-colors"><i class="ph ph-pencil-simple text-lg"></i></button>
                 <button onclick="deleteGoal('${g.id}')" title="Hapus Target" class="text-gray-400 hover:text-danger hover:bg-red-50 bg-white rounded-lg p-1.5 transition-colors"><i class="ph ph-trash text-lg"></i></button>
               </div>
             </div>
@@ -1113,12 +1285,17 @@
                 <p class="text-xs text-gray-500 mt-0.5">${formatDate(t.date)} &bull; ${walletName}</p>
               </div>
             </div>
-            <div class="text-right flex items-center gap-3">
-              <span class="font-bold ${colorClass}">${amountPrefix}${formatMoney(t.amount)}</span>
+            <div class="text-right flex items-center gap-1 md:gap-3">
+              <span class="font-bold ${colorClass} mr-2">${amountPrefix}${formatMoney(t.amount)}</span>
               ${!isCompact ? `
-              <button onclick="deleteTransaction('${t.id}')" title="Hapus Transaksi" class="text-gray-300 hover:text-danger hover:bg-red-50 p-1.5 rounded-lg opacity-100 md:opacity-0 group-hover:opacity-100 transition-all">
-                <i class="ph ph-trash"></i>
-              </button>
+              <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                 <button onclick="editTransaction('${t.id}')" title="Edit Transaksi" class="text-gray-400 hover:text-primary hover:bg-indigo-50 p-1.5 rounded-lg transition-all">
+                   <i class="ph ph-pencil-simple"></i>
+                 </button>
+                 <button onclick="deleteTransaction('${t.id}')" title="Hapus Transaksi" class="text-gray-400 hover:text-danger hover:bg-red-50 p-1.5 rounded-lg transition-all">
+                   <i class="ph ph-trash"></i>
+                 </button>
+              </div>
               ` : ''}
             </div>
           </div>
@@ -1250,7 +1427,7 @@
       showConfirm("PERINGATAN: Semua data akan dihapus permanen dari Perangkat & Cloud. Lanjutkan?", async () => {
          state = structuredClone(defaultState);
          try {
-            await setDoc(DATABASE_REF, state);
+            if (DATABASE_REF) await setDoc(DATABASE_REF, state);
             localStorage.removeItem(STORAGE_KEY);
             renderApp();
             showToast("Semua data berhasil di-reset.");
@@ -1265,7 +1442,7 @@
     document.getElementById('filter-type').addEventListener('change', renderApp);
 
     // Initial Load execution
-    loadData();
+    initApp();
 
   </script>
 </body>

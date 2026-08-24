@@ -334,7 +334,7 @@
 
       <!-- VIEW: WALLETS -->
       <section id="view-wallets" class="space-y-6 hidden">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <h2 class="text-2xl font-bold text-gray-800">Kelola Dompet</h2>
           <button onclick="openModal('add-wallet')" class="bg-primary hover:bg-primary-hover transition-colors text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 shadow-sm">
             <i class="ph ph-plus"></i> Tambah Dompet
@@ -348,7 +348,7 @@
 
       <!-- VIEW: SAVINGS -->
       <section id="view-savings" class="space-y-6 hidden">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 class="text-2xl font-bold text-gray-800">Tabungan Profesional</h2>
             <p class="text-gray-500 text-sm mt-1">Simpan dan kembangkan dana Anda dengan aman</p>
@@ -365,7 +365,7 @@
 
       <!-- VIEW: GOALS -->
       <section id="view-goals" class="space-y-6 hidden">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h2 class="text-2xl font-bold text-gray-800">Target Finansial</h2>
             <p class="text-gray-500 text-sm mt-1">Capai impianmu langkah demi langkah</p>
@@ -1447,21 +1447,26 @@
         }
 
         savingsGrid.innerHTML += `
-          <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow">
+          <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm relative overflow-hidden group hover:shadow-md transition-shadow flex flex-col h-full">
             <div class="w-2 h-full absolute left-0 top-0" style="background-color: ${s.color}"></div>
-            <div class="pl-4">
-               <div class="flex justify-between items-start mb-1">
-                 <h3 class="text-lg font-bold text-gray-800">${s.name}</h3>
-                 <div class="flex gap-1 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
-                   <button onclick="manageSavingModal('deposit', '${s.id}')" title="Setor" class="text-gray-400 hover:text-success hover:bg-emerald-50 p-1.5 rounded-lg transition-all"><i class="ph ph-plus-circle text-lg"></i></button>
-                   <button onclick="manageSavingModal('withdraw', '${s.id}')" title="Tarik" class="text-gray-400 hover:text-warning hover:bg-amber-50 p-1.5 rounded-lg transition-all"><i class="ph ph-minus-circle text-lg"></i></button>
-                   <button onclick="editSaving('${s.id}')" title="Edit" class="text-gray-400 hover:text-primary hover:bg-indigo-50 p-1.5 rounded-lg transition-all"><i class="ph ph-pencil-simple text-lg"></i></button>
-                   <button onclick="deleteSaving('${s.id}')" title="Hapus" class="text-gray-400 hover:text-danger hover:bg-red-50 p-1.5 rounded-lg transition-all"><i class="ph ph-trash text-lg"></i></button>
+            <div class="pl-4 flex flex-col h-full">
+               <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-4">
+                 <div class="flex-1">
+                   <h3 class="text-lg font-bold text-gray-800 leading-tight">${s.name}</h3>
+                   <p class="text-2xl font-bold text-gray-900 mt-1">${formatMoney(s.balance)}</p>
+                 </div>
+                 <div class="flex flex-wrap gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+                   <button onclick="manageSavingModal('deposit', '${s.id}')" title="Setor" class="flex-1 sm:flex-none flex items-center justify-center text-gray-500 hover:text-success hover:bg-emerald-50 p-2 rounded-xl transition-all border border-gray-100 hover:border-emerald-100 bg-gray-50 shadow-sm"><i class="ph ph-download-simple text-lg"></i></button>
+                   <button onclick="manageSavingModal('withdraw', '${s.id}')" title="Tarik" class="flex-1 sm:flex-none flex items-center justify-center text-gray-500 hover:text-warning hover:bg-amber-50 p-2 rounded-xl transition-all border border-gray-100 hover:border-amber-100 bg-gray-50 shadow-sm"><i class="ph ph-upload-simple text-lg"></i></button>
+                   <button onclick="editSaving('${s.id}')" title="Edit" class="flex-1 sm:flex-none flex items-center justify-center text-gray-500 hover:text-primary hover:bg-indigo-50 p-2 rounded-xl transition-all border border-gray-100 hover:border-indigo-100 bg-gray-50 shadow-sm"><i class="ph ph-pencil-simple text-lg"></i></button>
+                   <button onclick="deleteSaving('${s.id}')" title="Hapus" class="flex-1 sm:flex-none flex items-center justify-center text-gray-500 hover:text-danger hover:bg-red-50 p-2 rounded-xl transition-all border border-gray-100 hover:border-red-100 bg-gray-50 shadow-sm"><i class="ph ph-trash text-lg"></i></button>
                  </div>
                </div>
-               <p class="text-2xl font-bold text-gray-900">${formatMoney(s.balance)}</p>
-               ${targetHtml}
-               ${progressHtml}
+               
+               <div class="mt-auto">
+                 ${targetHtml}
+                 ${progressHtml}
+               </div>
             </div>
           </div>
         `;

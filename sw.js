@@ -1,6 +1,6 @@
 const CACHE_NAME = 'veno-app-v1';
 const urlsToCache = [
-  './KEUANGAN%20VENO.html',
+  './index.html',
   './WEBSITE%20WISHLIST.html',
   './manifest.json'
 ];

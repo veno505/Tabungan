@@ -170,6 +170,46 @@
 </head>
 <body class="flex h-screen overflow-hidden text-sm md:text-base">
 
+  <!-- AUTHENTICATION OVERLAY -->
+  <div id="auth-overlay" class="fixed inset-0 bg-gray-50 flex items-center justify-center z-[100] transition-opacity duration-300">
+    <div class="bg-white p-8 md:p-10 rounded-3xl shadow-xl w-full max-w-md border border-gray-100 transform transition-transform">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 bg-primary mx-auto rounded-2xl flex items-center justify-center text-white text-3xl mb-4 shadow-lg shadow-primary/30">
+          F
+        </div>
+        <h1 class="text-2xl font-bold text-gray-800">FinPro</h1>
+        <p class="text-sm text-gray-500 mt-1" id="auth-subtitle">Masuk untuk melanjutkan</p>
+      </div>
+
+      <div id="auth-error" class="hidden mb-4 p-3 bg-red-50 text-red-600 text-sm rounded-xl font-medium border border-red-100 flex items-center gap-2">
+        <i class="ph ph-warning-circle text-lg shrink-0"></i>
+        <span>HAYOLO SALAH, coba lu inget lagi deh email sama pw nya</span>
+      </div>
+
+      <form id="auth-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Email</label>
+          <input type="email" id="auth-email" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="email@contoh.com">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">Password</label>
+          <div class="relative">
+            <input type="password" id="auth-password" required class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all pr-12" placeholder="••••••••">
+            <button type="button" id="toggle-password" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary transition-colors p-1">
+              <i class="ph ph-eye text-xl" id="eye-icon"></i>
+            </button>
+          </div>
+        </div>
+        <button type="submit" id="auth-submit-btn" class="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl font-bold shadow-md transition-all mt-2">Masuk</button>
+      </form>
+      
+      <div class="mt-6 text-center text-sm text-gray-500">
+        <span id="auth-switch-text">Belum punya akun?</span> 
+        <button type="button" id="auth-switch-btn" class="text-primary font-bold hover:underline">Daftar sekarang</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Sidebar (Desktop) -->
   <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 h-full shadow-sm z-10">
     <div class="p-6 flex items-center gap-3 border-b border-gray-100">
@@ -209,10 +249,14 @@
       </button>
     </nav>
     
-    <div class="p-4 border-t border-gray-200">
+    <div class="p-4 border-t border-gray-200 space-y-2">
       <button onclick="openModal('add-transaction')" class="w-full bg-primary hover:bg-primary-hover text-white py-3 rounded-xl shadow-md font-medium flex justify-center items-center gap-2 transition-all transform hover:-translate-y-0.5">
         <i class="ph ph-plus-circle text-xl"></i>
         Catat Transaksi
+      </button>
+      <button id="btn-logout-desktop" class="w-full bg-red-50 hover:bg-red-100 text-danger py-3 rounded-xl font-medium flex justify-center items-center gap-2 transition-colors">
+        <i class="ph ph-sign-out text-xl"></i>
+        Keluar
       </button>
     </div>
   </aside>
@@ -229,9 +273,14 @@
           <span class="text-[9px] text-green-600 font-bold tracking-wider">CLOUD SYNC</span>
         </div>
       </div>
-      <button onclick="openModal('add-transaction')" class="bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
-        <i class="ph ph-plus text-lg"></i>
-      </button>
+      <div class="flex items-center gap-2">
+        <button id="btn-logout-mobile" class="text-danger bg-red-50 w-9 h-9 rounded-full flex justify-center items-center shadow-sm">
+          <i class="ph ph-sign-out text-lg"></i>
+        </button>
+        <button onclick="openModal('add-transaction')" class="bg-primary text-white w-9 h-9 rounded-full flex justify-center items-center shadow-md">
+          <i class="ph ph-plus text-lg"></i>
+        </button>
+      </div>
     </header>
 
     <!-- Scrollable Content Area -->
@@ -746,6 +795,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
     // Konfigurasi Firebase milik Anda
     const firebaseConfig = {
@@ -761,11 +811,10 @@
     // Inisialisasi Firebase & Firestore
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+    const auth = getAuth(app);
 
-    // Document Reference: uangku_data / my_personal_wallet
-    const DATABASE_REF = doc(db, "uangku_data", "my_personal_wallet");
-
-    const STORAGE_KEY = 'finpro_data_backup'; // Backup lokal
+    let DATABASE_REF = null;
+    let STORAGE_KEY = 'finpro_data_backup';
 
     // Default categories
     const defaultCategories = [
@@ -1964,8 +2013,103 @@
     });
     document.getElementById('filter-category').addEventListener('change', renderApp);
 
-    // Initial Load execution
-    loadData();
+    // ==============================================
+    // LOGIKA AUTENTIKASI (LOGIN / DAFTAR)
+    // ==============================================
+    let isLoginMode = true;
+    const authOverlay = document.getElementById('auth-overlay');
+    const authForm = document.getElementById('auth-form');
+    const authError = document.getElementById('auth-error');
+    const authSwitchBtn = document.getElementById('auth-switch-btn');
+    const authSwitchText = document.getElementById('auth-switch-text');
+    const authSubmitBtn = document.getElementById('auth-submit-btn');
+    const authSubtitle = document.getElementById('auth-subtitle');
+
+    const togglePasswordBtn = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('auth-password');
+    const eyeIcon = document.getElementById('eye-icon');
+
+    togglePasswordBtn.addEventListener('click', () => {
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        eyeIcon.classList.replace('ph-eye', 'ph-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        eyeIcon.classList.replace('ph-eye-slash', 'ph-eye');
+      }
+    });
+
+    authSwitchBtn.addEventListener('click', () => {
+      isLoginMode = !isLoginMode;
+      authError.classList.add('hidden');
+      if (isLoginMode) {
+        authSubtitle.innerText = 'Masuk untuk melanjutkan';
+        authSubmitBtn.innerText = 'Masuk';
+        authSwitchText.innerText = 'Belum punya akun?';
+        authSwitchBtn.innerText = 'Daftar sekarang';
+      } else {
+        authSubtitle.innerText = 'Daftar akun baru';
+        authSubmitBtn.innerText = 'Daftar';
+        authSwitchText.innerText = 'Sudah punya akun?';
+        authSwitchBtn.innerText = 'Masuk di sini';
+      }
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      authError.classList.add('hidden');
+      const email = document.getElementById('auth-email').value;
+      const password = document.getElementById('auth-password').value;
+
+      authSubmitBtn.disabled = true;
+      authSubmitBtn.innerText = 'Memproses...';
+
+      try {
+        if (isLoginMode) {
+          await signInWithEmailAndPassword(auth, email, password);
+        } else {
+          await createUserWithEmailAndPassword(auth, email, password);
+        }
+      } catch (error) {
+        authError.classList.remove('hidden');
+        authSubmitBtn.disabled = false;
+        authSubmitBtn.innerText = isLoginMode ? 'Masuk' : 'Daftar';
+      }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User berhasil login, sembunyikan layar login
+        authOverlay.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          authOverlay.classList.add('hidden');
+          authOverlay.classList.remove('flex');
+        }, 300);
+        
+        if (user.email === 'marveyno@gmail.com') {
+          DATABASE_REF = doc(db, 'uangku_data', 'my_personal_wallet');
+          STORAGE_KEY = 'finpro_marveyno_backup';
+        } else {
+          DATABASE_REF = doc(db, 'uangku_data', user.uid);
+          STORAGE_KEY = 'finpro_' + user.uid + '_backup';
+        }
+
+        // Mulai tarik data setelah konfigurasi reference DB siap
+        loadData();
+      } else {
+        // Tampilkan layar login kembali
+        authOverlay.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        authOverlay.classList.add('flex');
+        authSubmitBtn.disabled = false;
+        authSubmitBtn.innerText = isLoginMode ? 'Masuk' : 'Daftar';
+        authForm.reset();
+        passwordInput.type = 'password';
+        eyeIcon.classList.replace('ph-eye-slash', 'ph-eye');
+      }
+    });
+
+    document.getElementById('btn-logout-desktop')?.addEventListener('click', () => signOut(auth));
+    document.getElementById('btn-logout-mobile')?.addEventListener('click', () => signOut(auth));
 
   </script>
 </body>

@@ -866,7 +866,9 @@
           // Simpan ke local storage sebagai backup saat offline
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } else {
-          // Jika document tidak ada, buat dengan default data
+          // Jika document tidak ada, ini adalah PENGGUNA BARU.
+          // KITA WAJIB mereset 'state' ke default agar tidak tercampur dengan user sebelumnya
+          state = structuredClone(defaultState);
           await setDoc(DATABASE_REF, state);
         }
       } catch (error) {
@@ -2105,6 +2107,11 @@
         authForm.reset();
         passwordInput.type = 'password';
         eyeIcon.classList.replace('ph-eye-slash', 'ph-eye');
+
+        // Reset state so data doesn't bleed over to the next user
+        state = structuredClone(defaultState);
+        DATABASE_REF = null;
+        renderApp();
       }
     });
 

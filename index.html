@@ -375,7 +375,11 @@
             <select id="filter-category" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
               <option value="all">Semua Kategori</option>
             </select>
-            <input type="month" id="filter-month-tx" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
+            <select id="filter-period-tx" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none">
+              <option value="month">Per Bulan</option>
+              <option value="all">All Time</option>
+            </select>
+            <input type="month" id="filter-month-tx" class="px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white outline-none disabled:opacity-40 disabled:cursor-not-allowed">
           </div>
           
           <div id="all-transactions-list" class="divide-y divide-gray-100">
@@ -1464,7 +1468,9 @@
 
       renderTransactionList('recent-transactions-list', state.transactions.slice().sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5), true);
 
-      let filteredTx = state.transactions.filter(t => t.date.startsWith(txMonth));
+      const isAllTime = document.getElementById('filter-period-tx').value === 'all';
+      document.getElementById('filter-month-tx').disabled = isAllTime;
+      let filteredTx = isAllTime ? [...state.transactions] : state.transactions.filter(t => t.date.startsWith(txMonth));
       if(txTypeFilter !== 'all') {
          filteredTx = filteredTx.filter(t => t.type === txTypeFilter);
       }
@@ -2029,6 +2035,7 @@
 
     document.getElementById('filter-month').addEventListener('change', renderApp);
     document.getElementById('filter-month-tx').addEventListener('change', renderApp);
+    document.getElementById('filter-period-tx').addEventListener('change', renderApp);
     document.getElementById('filter-type').addEventListener('change', () => {
       document.getElementById('filter-category').value = 'all';
       renderApp();
